@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>拖拽</title>
+    <style>
+        body {position:relative;margin: 0;padding: 0;}
+        div {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100px;
+            height: 100px;
+            background-color: #437356;
+        }
+        div#div2 {
+            background-color: #475678;
+        }
+    </style>
+</head>
+<body>
+    <div id="div1"></div>
+    <div id="div2"></div>
+    <script>
+        function Drag(id) {
+            this.elem = document.getElementById(id);
+            this.disX = 0;
+            this.disY = 0;
+            this.init();
+        }
+        
+        Drag.prototype.init = function(e) { 
+            this.elem.onmousedown = function(e) {
+                this.down(e);
+                document.onmousemove = function(e){
+                    this.move(e);
+                }.bind(this);
+                document.onmouseup = function(e) {
+                    this.up(e);
+                }.bind(this);
+            }.bind(this);
+        } 
+
+        Drag.prototype.down = function(e) {
+            this.disX = parseInt(e.pageX) - parseInt(this.elem.offsetLeft);
+            this.disY = parseInt(e.pageY) - parseInt(this.elem.offsetTop);
+        }
+
+        Drag.prototype.move = function(e) {
+            this.elem.style.left = e.pageX - this.disX + 'px';
+            this.elem.style.top = e.pageY - this.disY + 'px';
+        }
+
+        Drag.prototype.up = function(e) {
+            document.onmousemove = null;
+            document.onmouseup = null;
+        }
+        
+        var div1 = new Drag('div1');
+        var div2 = new Drag('div2');
+    </script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>函数封装</title>
+</head>
+<body>
+	<script>
+		function compare(val1,val2) {
+			if(val1 < val2) {
+				return 1;
+			} else if(val1 > val2) {
+				return -1;
+			} else {
+				return 0;
+			}
+		}
+		var values = [0,23,48,459,-1,2,49,0];
+		values.sort(compare);
+		console.log(values)
+	</script>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Dom排序</title>
+	<style type="text/css">
+		ul li {
+			list-style: none;
+			margin-bottom: 10px;
+		}
+	</style>
+</head>
+<body>
+	<button id="btn">点我排序</button>
+	<ul id="ul">
+		<li>3</li>
+		<li>34</li>
+		<li>64</li>
+		<li>13</li>
+		<li>85</li>
+		<li>46</li>
+		<li>74</li>
+		<li>33</li>
+		<li>70</li>
+		<li>6</li>
+	</ul>
+	<script type="text/javascript">
+		var btn = document.getElementById("btn");
+		var uls = document.getElementById("ul");
+		var lis = document.getElementsByTagName("li");
+		// js实现隔行变色
+		for(var i = 0; i < lis.length;i++) {
+			if(i%2) {
+				lis[i].style.background = 'aqua';
+			}
+			else {
+				lis[i].style.background = 'pink';
+			}
+		}
+		var iNow = -1;
+		btn.onclick = function() {
+			iNow = iNow*(-1);
+			// iNow *= -1;
+			/*点击实现升序排列，再点击的时候实现降序排列*/
+			var result = [];
+			for(var i = 0; i < lis.length;i++) {
+				result.push(lis[i]);
+			}
+			result.sort(function(li1,li2){
+				return iNow*(li1.innerHTML - li2.innerHTML);
+			})
+			for(var j = 0;j< result.length;j++) {
+				uls.appendChild(result[j]);
+			}
+		}
+	</script>
+</body>
+</html>

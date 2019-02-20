@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>js实现京东无延迟菜单效果</title>
+	<script type="text/javascript" src="js/jquery-1.9.1.js"></script>
+</head>
+<style type="text/css">
+	.wrap {
+		position: relative;
+		width: 1200px;
+		margin: 0 auto;
+	}
+	.wrap .menu {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 240px;
+		height: 578px;
+		background-color: #f5f5f5;
+		z-index: 100;
+		margin: 0;
+		padding: 0;
+	}
+	.wrap .menu .title {
+		height: 40px;
+		line-height: 40px;
+		background-color: #15aafb;
+		width: 240px;
+		color: #fff;
+		padding: 0 10px;
+		box-sizing: border-box;
+	}
+	.wrap .menu li {
+		width: 240px;
+		height: 48px;
+		line-height: 48px;
+		text-align: center;
+		margin: 0;
+		padding-right: 0;
+		list-style: none;
+		font-size: 14px;
+		cursor: pointer;
+		box-sizing: border-box;
+		padding: 0 15px;
+		text-align: left;
+		position: relative;
+	}
+	.wrap .menu li:after {
+		position: absolute;
+		right: 15px;
+		top: 50%;
+		margin-top: -3px;
+		content: "";
+		width: 6px;
+		height: 6px;
+		border-width: 1px;
+		border-color: #aaa #aaa transparent transparent;
+		border-style: solid;
+		transform: rotate(45deg);
+	}
+	.wrap .menu li:hover {
+		background-color: #fff;
+	}
+	.wrap .menu li a {
+
+	}
+	.wrap .sub {
+		margin-left: 240px;
+		height: 538px;
+		float: left;
+		margin-top: 40px;
+	}
+	.wrap .sub.show {
+		display: block;
+	}
+	.wrap .sub.none {
+		display: none;
+	}
+	.wrap .sub ul {
+		width: 240px;
+		height: 538px;
+		padding: 0;
+		margin: 0;
+		list-style: none;
+		background-color: #fff;
+		box-shadow: 0 0 20px 3px rgba(0,0,0,.2);
+	}
+	.wrap .sub ul li {
+		width: 180px;
+		margin: 0 auto;
+		height: 44px;
+		line-height: 44px;
+		font-size: 14px;
+		cursor: pointer;
+	}
+	.wrap .sub ul li a:hover {
+		color: #15aafb;
+	}
+	.wrap .sub ul li:first-child {
+		height: 48px;
+		line-height: 48px;
+		border-bottom: 1px solid #dddee1;
+		color: #15AAFB;
+	}
+</style>
+<body>
+	<div class="wrap">
+		<ul class="menu">
+			<div class="title">数据导航</div>
+			<li data-id="a"><span>交通、环境</span></li>
+			<li data-id="b"><span>公共服务</span></li>
+			<li data-id="c"><span>健康医疗</span></li>
+			<li data-id="d"><span>金融商贸</span></li>
+			<li data-id="e"><span>科研应用</span></li>
+			<li data-id="f"><span>社交与征信</span></li>
+			<li data-id="g"><span>文娱、音乐</span></li>
+			<li data-id="h"><span>知识产权</span></li>
+			<li data-id="i"><span>智慧生活</span></li>
+			<li data-id="g"><span>产业数据</span></li>
+			<li data-id="k"><span>政府数据</span></li>
+		</ul>
+		<div class="sub none">
+			<ul id="a">
+				<li><a herf="javascript:;">交通、环境</a></li>
+				<li><a herf="javascript:;">交通与地理信息数据</a></li>
+				<li><a herf="javascript:;">环境资料与环境监测数据</a></li>
+				<li><a herf="javascript:;">气象资料与气象监测数据</a></li>
+			</ul>
+			<ul id="b">
+				<li><a herf="javascript:;">公共服务</a></li>
+				<li><a herf="javascript:;">劳动与雇佣关系数据</a></li>
+				<li><a herf="javascript:;">失业、就业及社会保障</a></li>
+				<li><a herf="javascript:;">社保信息相关数据</a></li>
+				<li><a herf="javascript:;">劳动仲裁、纠纷数据</a></li>
+				<li><a herf="javascript:;">政府监督与督办数据</a></li>
+				<li><a herf="javascript:;">统计与各类年鉴数据</a></li>
+				<li><a herf="javascript:;">司法强制与判决数据</a></li>
+				<li><a herf="javascript:;">家族、宗族与姓氏数据</a></li>
+				<li><a herf="javascript:;">家庭婚姻与生活服务</a></li>
+				<li><a herf="javascript:;">文化，旅游与便民服务</a></li>
+				<li><a herf="javascript:;">创意文化与创意设计数据</a></li>
+			</ul>
+			<ul id="c">
+				<li><a herf="javascript:;">健康医疗</a></li>
+				<li><a herf="javascript:;">健康与医疗基础数据</a></li>
+				<li><a herf="javascript:;">食疗食补</a></li>
+				<li><a herf="javascript:;">重要秘方</a></li>
+			</ul>
+			<ul id="d">
+				<li><a herf="javascript:;">金融商贸</a></li>
+				<li><a herf="javascript:;">互联网金融与产业金融数据</a></li>
+				<li><a herf="javascript:;">金融机构及监管数据</a></li>
+				<li><a herf="javascript:;">各类中介与专业服务数据</a></li>
+				<li><a herf="javascript:;">商业情报与竞争情报数据</a></li>
+				<li><a herf="javascript:;">采购与物流</a></li>
+				<li><a herf="javascript:;">上市公司与关联业务数据</a></li>
+				<li><a herf="javascript:;">国际合作、代理与贸易</a></li>
+			</ul>
+			<ul id="e">
+				<li><a herf="javascript:;">科研应用</a></li>
+				<li><a herf="javascript:;">学术与课题研发数据</a></li>
+				<li><a herf="javascript:;">专业市场与行业价格数据</a></li>
+				<li><a herf="javascript:;">研究项目与成果数据</a></li>
+				<li><a herf="javascript:;">各类科研工具数据</a></li>
+				<li><a herf="javascript:;">行业专家库与知识库数据</a></li>
+				<li><a herf="javascript:;">各类设计样本与图纸数据</a></li>
+				<li><a herf="javascript:;">各类机械设计与生产数据</a></li>
+			</ul>
+			<ul id="f">
+				<li><a herf="javascript:;">社交与征信</a></li>
+				<li><a herf="javascript:;">社交网络用户贡献数据</a></li>
+				<li><a herf="javascript:;">社会调查及问卷数据</a></li>
+				<li><a herf="javascript:;">浪费行为与电子商务数据</a></li>
+				<li><a herf="javascript:;">第三方征信与黑名单数据</a></li>
+				<li><a herf="javascript:;">第三方信息监测与评估数据</a></li>
+			</ul>
+			<ul id="g">
+				<li><a herf="javascript:;">文娱、音乐</a></li>
+				<li><a herf="javascript:;">大陆歌星</a></li>
+				<li><a herf="javascript:;">日韩歌星</a></li>
+				<li><a herf="javascript:;">经典音乐</a></li>
+				<li><a herf="javascript:;">儿童音乐</a></li>
+				<li><a herf="javascript:;">DJ舞曲/广场舞</a></li>
+				<li><a herf="javascript:;">文化</a></li>
+				<li><a herf="javascript:;">娱乐</a></li>
+			</ul>
+			<ul id="h">
+				<li><a herf="javascript:;">知识产权</a></li>
+				<li><a herf="javascript:;">股权、版权等流转分析</a></li>
+				<li><a herf="javascript:;">各类专利数据</a></li>
+				<li><a herf="javascript:;">著作权与知识产权数据</a></li>
+				<li><a herf="javascript:;">各类商标权数据</a></li>
+			</ul>
+			<ul id="i">
+				<li><a herf="javascript:;">智慧生活</a></li>
+				<li><a herf="javascript:;">语音与图像识别数据</a></li>
+				<li><a herf="javascript:;">通信与信息产业数据</a></li>
+				<li><a herf="javascript:;">智能设备采集数据</a></li>
+				<li><a herf="javascript:;">智慧城市与公共服务数据</a></li>
+				<li><a herf="javascript:;">3D打印与智慧制造数据</a></li>
+				<li><a herf="javascript:;">智能家居与装修装饰数据</a></li>
+			</ul>
+			<ul id="j">
+				<li><a herf="javascript:;">产业数据</a></li>
+				<li><a herf="javascript:;">文化</a></li>
+				<li><a herf="javascript:;">农业</a></li>
+				<li><a herf="javascript:;">影视</a></li>
+				<li><a herf="javascript:;">能源</a></li>
+				<li><a herf="javascript:;">银行</a></li>
+			</ul>
+			<ul id="k">
+				<li><a herf="javascript:;">政府数据</a></li>
+				<li><a herf="javascript:;">科教文体</a></li>
+				<li><a herf="javascript:;">人才、就业</a></li>
+				<li><a herf="javascript:;">医疗卫生</a></li>
+				<li><a herf="javascript:;">住房、民生</a></li>
+				<li><a herf="javascript:;">交通出行</a></li>
+				<li><a herf="javascript:;">户籍、生育</a></li>
+				<li><a herf="javascript:;">税收、财政</a></li>
+				<li><a herf="javascript:;">工商、质检</a></li>
+				<li><a herf="javascript:;">环保、公益</a></li>
+				<li><a herf="javascript:;">城建、规划</a></li>
+				<li><a herf="javascript:;">司法、诉讼</a></li>
+			</ul>
+		</div>
+	</div>
+	<script type="text/javascript">
+		// $(document).ready(function() {
+		// 	$(".sub ul").hide();
+		// 	$(".menu li").mouseenter(function(){
+		// 		var $id = $(this).attr("data-id");
+		// 		$("#" + $id).show().siblings().hide();
+		// 	})
+		// 	// $(".menu").mouseleave(function() {
+		// 	// 	$(".sub").hide();
+		// 	// })
+		// })
+
+		//业务逻辑是：鼠标移动到列表上的时候，其对应的子项显示，切鼠标可以移动到子项上，鼠标移出的时候其子项隐藏
+		var wrap = $('.wrap');
+		var sub = $('sub');
+		var menu = $('menu');
+		wrap.onmouseenter = function() {
+			.on('mouseenter','li',function(e) {
+				
+			})
+		}
+	</script>
+</body>
+</html>

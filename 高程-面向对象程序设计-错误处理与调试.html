@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<script type="text/javascript">
+		try {
+			console.log(hah)
+		} catch(error) {
+			console.log(error.name)//ReferenceError
+			console.log(error.message)//hah is not defined
+		} finally {
+			console.log('finally语句始终会执行,无论try中的语句是错的还是对的')
+		}
+
+		function testPrev() {
+			try {
+				return 2;
+			} catch(error) {
+				return 1;
+			} finally {
+				return 0;
+			}
+		}
+		
+		console.log(testPrev()); //0 即使try语句没有错误 也会执行finally语句 即使使用了return语句
+
+
+		// var arr = new Array(-29) //RangeError 在数值超出相应范围的时候触发
+
+		//跨浏览器处理错误类型
+		try {
+			myFunction();
+		} catch(error) {
+			if(error instanceof ReferenceError) {
+				//处理引用错误
+			} else if(error instanceof TypeError) {
+				//处理类型错误
+			} else {
+				//处理其他错误
+				console.log('出现错误');
+			}
+		}
+
+		//抛出自定义类型的错误
+		// throw '发生错误';
+		// throw true;
+		// throw 0;
+
+		// throw new Error('something bad happend');
+
+		function CustomError(message) {
+			this.name = 'CustomError';
+			this.message = message;
+		}
+
+		//原型对象等于另一个类型的实例
+
+		// 即此处的customError实例中包含了一个prototype指针 指向了customError的原型 而customError的原型又等于Error的实例 Error的实例中又包含了一个指针指向了Error的原型
+		CustomError.prototype = new Error();
+		// throw new CustomError('My message');
+
+		function process(values) {
+			if(!(values instanceof Array)) {
+				throw new CustomError('process()：Argument must be an array');
+			}
+			values.sort();
+			for(var i = 0; i < values.length;i++) {
+				if(values[i] > 100) {
+					return values[i];
+				}
+			}
+			return -1;
+		}
+		// process('222');
+
+		//类型转换错误
+		console.log(5 == '5');//true
+		console.log(5 === '5');//false
+
+		console.log(true == 1);//true
+		console.log(true === 1);//false
+
+		//查询字符串
+		function addQueryStringArg(url,name,value) {
+			if(url.indexOf("?") == -1) {
+				url += "?";
+			} else {
+				url += "&";
+			}
+			url += encodeURIComponent(name) + "=" + encodeURIComponent(value);
+			return url;
+		}
+		var url = "http://www.somedomain.com";
+		var newUrl = addQueryStringArg(url,"redir","http://www.someotherdomain.com?a=b&c=d");
+		// alert(newUrl);
+		//http://www.somedomain.com?redir=http%3A%2F%2Fwww.someotherdomain.com%3Fa%3Db%26c%3Dd
+
+
+		//致命错误记录到服务器
+		function logError(sev,msg) {
+			var img = new Image();
+			img.src = "log.php?sev=" + encodeURIComponent(sev) + "&msg" + encodeURIComponent(msg);
+		}
+
+		// for(var i = 0;i < nodes.length;i++) {
+		// 	try {
+		// 		nodes[i].init();
+		// 	} catch(er) {
+		// 		logError('nonfatal','Module init failed:' + er.message);
+		// 	}
+		// }
+
+		//抛出错误
+		function device(sum1,sum2) {
+			if(typeof sum1 != "number" && typeof sum2 != "number") {
+				throw new Error("device():Both arguments must be numbers.")
+			}
+			return sum1 / sum2;
+		}
+	</script>
+</body>
+</html>

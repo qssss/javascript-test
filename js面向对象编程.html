@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>鼠标按下拖拽</title>
+</head>
+<style type="text/css">
+	div {
+		width: 100px;
+		height: 100px;
+		margin-bottom: 100px;
+		cursor: pointer;
+		position: absolute;
+	}
+	#div1 {
+		background-color: red;
+	}
+	#div2 {
+		background-color: blue;
+	}
+</style>
+<body>
+	<div id="div1"></div>
+	<div id="div2"></div>
+	<script type="text/javascript">
+		// 面向对象编程的目的
+		// 1.重用性: 争对相同的功能可以重复的使用程序
+		// 2.灵活性: 争对差异性功能做出调整和适配
+		// 3.可扩展性: 根据功能的变化做出删除或添加功能的操作
+
+		// 面向对象编程的特性
+		// 1.封装性
+		// 2.继承性
+		// 3.多态性
+		function Drag(id) {
+			this.elem = document.getElementById(id);
+			this.disX = 0;
+			this.disY = 0;
+		};
+
+		Drag.prototype.init = function() {  // 初始化方法
+			this.elem.onmousedown = (ev) => {
+				this.down(ev);
+				document.onmousemove = (ev) => {
+					this.move(ev);
+				};
+				document.onmouseup = ()=>{
+					this.up();
+				};
+			};
+		};
+
+		Drag.prototype.down = function(ev) { // 按下的方法
+			this.disX = ev.pageX - this.elem.offsetLeft;
+			this.disY = ev.pageY - this.elem.offsetTop;
+		};
+
+		Drag.prototype.move = function(ev) { // 移动的方法
+			this.elem.style.left = ev.pageX - this.disX + 'px';
+			this.elem.style.top = ev.pageY - this.disY + 'px';
+		};
+
+		Drag.prototype.up = function() { // 抬起的方法
+			document.onmousemove = null;
+			document.onmouseup = null;
+		};
+
+		var p1 = new Drag('div1');
+		p1.init();
+
+		var p2 = new Drag('div2');
+		p2.init();
+	</script>
+</body>
+</html>

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>面向对象设计-创建对象</title>
+</head>
+<body>
+	<script type="text/javascript">
+		// var data = [{name:'neo',age:5},{name:'john',age:16}];
+
+		// function compare(property) {
+		// 	return function(object1,object2) {
+		// 		var value1 = object1[property];
+		// 		var value2 = object2[property];
+		// 		if(value1 < value2) {
+		// 			return -1;
+		// 		} else if(value1 > value2) {
+		// 			return 1;
+		// 		} else {
+		// 			return 0;
+		// 		}
+		// 	}
+		// }
+		// data.sort(compare('age'));
+		// console.log(data[0].age);
+
+		// function outer() {
+		// 	alert(arguments.callee.caller);
+		// }
+
+		// var sum = function() {
+		// 	outer();
+		// }
+
+		// sum()
+		var stringValue = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit';
+		var m = stringValue.trim();
+		var arr = [];
+		for(var i = 0;i < stringValue.length;i++) {
+			if(stringValue.indexOf('e',i)!= -1) {
+				i = stringValue.indexOf('e',i);
+				arr.push(i); //Array(5) [ 3, 24, 32, 35, 51 ]
+			}
+		}
+		console.log(arr)
+		console.log(m)
+
+		var a1 = 'you are very beautiful';
+		var a2 = a1.toLocaleUpperCase();
+		console.log(a2);
+
+		var text = 'cat,pat,chat,mat';
+		var pattern = /.at/;
+		var matches = text.match(pattern);
+		var exe = pattern.exec(text);
+		console.log(matches);
+		console.log(exe[0]);
+		var re = text.replace(/at/g,'pt');
+		console.log(re);
+
+		var sp = text.split('^\.');
+		console.log(sp);
+
+		var str = 'some';
+		var result = str.localeCompare('trr');
+		console.log(result);
+
+		var uri = 'http://www.baidu.com';
+		var res = encodeURIComponent(uri);
+		var ar = decodeURIComponent(res);
+		console.log(ar);
+
+		// eval('function sayhi(){alert("hi")}');
+		// sayhi();
+		var person = {
+			name: 'huanglijuan',
+			age: 18,
+			sayName: function() {
+				console.log(this.name);
+			}
+		}
+		console.log(person.name.Configurable)
+		person.sayName();
+
+		// var book = {
+		// 	_year: 2018,
+		// 	edition: 1,
+		// };
+		// Object.defineProperty(book,'year',{
+		// 	get: function() {
+		// 		return this._year
+		// 	},
+		// 	set: function(newValue) {
+		// 		if(newValue > 2018) {
+		// 			this._year = newValue;
+		// 			this.edition += newValue - 2018;
+		// 		}
+		// 	}
+		// })
+		// book.year = 2020;
+		// console.log(book.edition);
+
+		var book = {
+			
+		};
+		Object.defineProperties(book, {
+			_year: {
+				value: 2018
+			},
+			edition: {
+				value: 1,
+				writable: true,
+				configurable: true
+			},
+			year: {
+				get: function() {
+					return this._year;
+				},
+				set: function(newValue) {
+					if(newValue > 2018) {
+						this._year = newValue;
+						this.edition = newValue - 2018;
+					}
+				}
+			}
+		});
+		book._year = 2020;
+		console.log(book.edition);
+		var a = Object.getOwnPropertyDescriptor(book,'_year');
+		console.log(typeof a.get)
+
+		// var obj = new Object();
+		// Object.defineProperties(obj, {
+		//     name: {
+		//         value: '张三',
+		//         configurable: false,//可以修改
+		//         writable: true,
+		//         // enumerable: true
+		//     },
+		//     age: {
+		//         value: 18,
+		//         // configurable: true
+		//     }
+		// })
+		// obj.name = 'huanghuang';
+		// obj.age = 16;
+		// console.log(obj.name, obj.age) // 张三, 18
+
+		//工厂模式
+		// function createPerson(name,age) {
+		// 	var o = new Object();
+		// 	o.name = name;
+		// 	o.age = age;
+		// 	o.sayName = function() {
+		// 		console.log(this.name)
+		// 	}
+		// 	return o; //返回的是一个对象
+		// }
+		
+		// person1.sayName();var person1 = createPerson('amy',18);
+
+		//构造函数模式
+		// function Person(name,age) {
+		// 	this.name = name;
+		// 	this.age = age;
+		// 	this.sayName = function() {
+		// 		console.log(this.name);
+		// 	}
+		// }
+		// // var person1 = new Person('娟娟',18); // 创建对象，然后将构造函数的作用域赋值给新创建的对象，因此this指向新创建的对象person1
+		// // person1.sayName();
+		// // console.log(person1.constructor == Person) //true
+
+		// // Person('娟娟',18);//通过window调用,则this值是window
+		// // window.sayName();//通过window调用
+
+		// var o1 = {};
+		// Person.call(o1,'娟娟',18);
+		// o1.sayName();
+
+		//原型模式
+		// function Person() {};
+		// Person.prototype.name = '黄黄';
+		// Person.prototype.age = 18;
+		// Person.prototype.sayName = function() {
+		// 	console.log(this.name);
+		// }
+
+		// var person1 = new Person();
+		// person1.sayName();
+
+		// var person2 = new Person();
+		// person2.sayName();
+
+		// console.log(person1.sayName == person2.sayName);
+		// console.log(Object.getPrototypeOf(person1)) //Object.getprototypeOf()获取某个对象(实例)的原型对象
+		// console.log(Object.getPrototypeOf(person1) == Person.prototype) //true
+		// console.log(Person.prototype.isPrototypeOf(person1)) //true  isPrototypeOf()用来判断是不是某个实例的原型对象
+
+		// person1.name = '娟娟';
+		// person1.sayName(); // 娟娟 屏蔽了原型对象中的同名属性
+
+		// // delete person1.name;
+		// // person1.sayName() // 黄黄  重新建立起了连接
+
+		// delete Person.prototype.name;
+		// person1.sayName();// undefined
+
+		// console.log(person1.hasOwnProperty('name')); //true  实例的hasOwnProperty()方法判断某个属性是存在于实例中还是存在于原型对象中,只有存在于实例中才返回true
+		// console.log(person2.hasOwnProperty('name')); //false
+
+
+		// function hasPrototypePeroperty(object,name) {
+		// 	return !object.hasOwnproperty('name') && (name in object);//自定义函数 属性只有存在于原型对象中的时候 才返回true
+		// }
+
+
+		// var o3 = {
+		// 	toString: function() {
+		// 		return 'my project';
+		// 	}
+		// }
+
+		// for(var prop in o3) {
+		// 	if(prop == 'toString') {
+		// 		alert('hahh')
+		// 	}
+		// }
+
+		// console.log(Object.keys(Person.prototype));
+		// console.log(Object.getOwnPropertyNames(Person.prototype));
+
+		// var arr = [{age:1},{age:2},{age:3},{age:4}];
+		// var sum = null;
+		// for(var i = 0;i < arr.length;i++) {
+		// 	// debugger;
+		// 	sum += arr[i].age;
+		// }
+		// console.log(sum);
+
+		// function People() {};
+		// People.prototype = {
+		// 	name: 'huanghuang',
+		// 	age: 18,
+		// 	sayName: function() {
+		// 		console.log(this.name);
+		// 	}
+		// }
+		// var friend = new People();
+		// console.log(friend.constructor == Object); //true
+		// console.log(friend.constructor == People); //false
+		// console.log(person1.constructor == Object) //false
+		// console.log(person1.constructor == Person) //true
+
+
+		// 综合使用构造函数模式和原型模式
+		// function Person(name,age,job) {
+		// 	this.name = name;
+		// 	this.age = age;
+		// 	this.job = job;
+		// 	this.friends = ['胡慧君','贺婷'];
+		// }
+		// Person.prototype = {
+		// 	constructor: Person,
+		// 	sayName: function() {
+		// 		console.log(this.name);
+		// 	}
+		// }
+
+		// var Dongtingyan = new Person('董庭艳',18,'anchor');
+		// var huanglijuan = new Person('黄丽娟',16,'WEB');
+		// Dongtingyan.friends.push('荣荣兔');
+
+		// console.log(Dongtingyan.name);
+		// console.log(Dongtingyan.age);
+		// console.log(Dongtingyan.friends);
+		
+
+		// console.log(huanglijuan.name);
+		// console.log(huanglijuan.age);
+		// console.log(huanglijuan.friends);
+
+		//动态原型模式
+		// function Person(name,age,job) {
+		// 	this.name = name;
+		// 	this.age = age;
+		// 	this.job = job;
+		// 	if(typeof this.sayName != 'function') {
+		// 		Person.prototype.sayName = function() {
+		// 			console.log(this.name);
+		// 		}
+		// 	}
+		// }
+		// var person1 = new Person('黄丽娟',18,'WEB');
+		// person1.sayName();
+		// var person2 = new Person('董庭艳',18,'anchor');
+		// person2.sayName();
+
+		// console.log(person1.sayName == person2.sayName); //true
+
+		//寄生构造函数模式      
+		// function Person(name,age,job) {
+		// 	var o = new Object();
+		// 	o.name = name;
+		// 	o.age = age;
+		// 	o.job = job;
+		// 	o.sayName = function() {
+		// 		console.log(this.name);
+		// 	}
+		// 	return o;
+		// }
+		// var person1 = new Person('黄丽娟',18,'WEB');
+		// person1.sayName();
+
+		// var person2 = new Person('董庭艳',18,'WEB');//类似工厂函数  而且通过new操作符调用 
+		// person2.sayName(); //这种模式下返回的对象与构造函数的原型没什么关系 因此不能依赖instanceof来判断对象的类型
+
+		// console.log(person1.sayName == person2.sayName); // false
+
+
+		// function spercialArray() {
+		// 	var values = new Array();
+		// 	values.push.apply(values,arguments);
+		// 	values.toPipesArray = function() {
+		// 		console.log(values.join('|'));
+		// 	}
+		// 	return values;
+		// }
+
+		// var arr = new spercialArray(21,23,48);
+		// arr.toPipesArray()
+
+		// 稳妥构造函数模式		
+		function Person(name) {
+			var o = new Object();
+			o.sayName = function() {
+				console.log(name);
+			}
+			return o;
+		}
+		var friend = Person('黄黄');
+		friend.sayName(); 
+	</script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<style type="text/css">
+	.box {
+		width: 100px;
+		height: 100px;
+		background-color: red;
+		position: absolute;
+		left: 300px;
+		top: 300px;
+	}
+</style>
+<body>
+	<div class="box"></div>
+	<script type="text/javascript">
+		//鼠标拖动方块,并将方块每次移动之后的位置记录在cookie当中,下一次打开网页的时候获取上一次网页关闭之前的方块位置
+		var disx = 0,
+			disy = 0,
+			div = document.getElementsByClassName("box")[0];
+
+		//获取cookie中上一次方块移动之后的位置
+		if(getCookie('x')&&getCookie('y')) {
+
+			div.style.left = getCookie('x') + 'px';
+			div.style.top = getCookie('y') + 'px';
+
+		}
+
+		div.onmousedown = function(e) {
+
+			var This = this;
+			disx = e.pageX - div.offsetLeft;
+			disy = e.pageY - div.offsetTop;
+
+			document.onmousemove = function(e) {
+
+				this.style.left = e.pageX - disx + 'px';
+				this.style.top = e.pageY - disy + 'px';
+
+			}.bind(this);
+
+			document.onmouseup = function() {
+
+				this.onmousemove = null;
+				
+				//鼠标抬起的时候记录方块的位置
+				setCookie('x',This.style.left,10);
+				setCookie('y',This.style.top,10);
+
+			}
+		}	
+
+		//设置cookie
+		function setCookie(key,value,times) {
+			var date = new Date();
+			date.setDate(date.getDate() + times);
+			document.cookie = key + '=' + value + '; ' + times + '=' + date;
+		}
+		//获取cookie
+		function getCookie(key) {
+			var cookies = document.cookie.split('; ');
+			for(var i = 0;i < cookies.length;i++) {
+				var itemCookies = cookies[i].split('=');
+				if(itemCookies[0] == key) {
+					return itemCookies[1];
+				}
+			}
+		}
+		//删除cookie(只需将expires设置为过去的时间即可)
+		function delCookie(key) {
+			setCookie(key,'',-1);   
+		}
+	</script>
+</body>
+</html>

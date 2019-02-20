@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<script type="text/javascript">
+		// let和const的共同点
+
+		// 1.不能重复定义
+
+		// let a = 3;
+		// let a = 4;
+
+		// 2.全局环境下,并没有挂载在window下
+		// let a = 8;
+		// console.log(window.a) // undefined
+
+		// 3.具备块级作用域
+		// if(1) {
+		// 	let a = 8;
+		// }
+		// console.log(a); // not defined
+
+		// const
+		// 1. 用来定义常量
+		// const A = 8;
+
+		// 2.必须要变量名进行赋值
+		// const m; //未声明
+
+		// 3.人为规定，常量名要大写
+		// const PI = 3.1415926
+
+
+
+
+		//模版字符串
+
+		//es6之前字符串不能换行
+		// var m = "<ul>
+		// 			<li></li>
+		// 			<li></li>
+		// 		</ul>"
+
+		//解决办法一般使用字符串拼接或者反斜杠
+
+		//字符串拼接
+		var m = "<ul>"+
+			 		"<li></li>"+
+					"<li></li>"+
+				 "</ul>"
+		console.log(m);
+
+		//反斜杠
+		var m = "<ul>\
+					<li></li>\
+					<li></li>\
+				</ul>"
+		console.log(m);
+
+		//es6中提供了模版字符串的写法,使用反引号来代替双引号
+		var m = `<ul>
+					<li></li>
+					<li></li>
+				</ul>`
+		console.log(m);
+
+
+
+		//模版占位符： ${}
+		var a = 'hello';
+		var b = 'world';
+		var m = `<ul>
+					<li>${a} ${b}</li>
+				</ul>`
+		console.log(m);
+
+
+
+		// 结构赋值
+
+		// 数组的结构赋值
+		var [c,d] = [1,2];
+		console.log(c);
+		console.log(d);
+
+		// 对象的解构赋值
+		var {name,age,job} = {
+			name: 'xiaoming',
+			age: 24,
+			job: 'student'
+		}
+		console.log(name); // xiaoming
+		console.log(age); // 24
+		console.log(job); // student
+
+		//嵌套形式
+		var [e,{f},g] = ['e值',{f:'f值'},'g值'];
+		console.log(e); // e值
+		console.log(f); // f值
+		console.log(g); // g值
+
+
+		// 默认参数和剩余(rest)参数/不定参数
+		// 剩余参数的四个特点：
+		// 1.用...表示
+		// 2.返回一个数组
+		// 3.必须是最后一个参数
+		// 4.函数的剩余参数不包含在函数的形参里面
+
+		// 解构赋值的默认参数
+		var [h = 4,i = 8] = [];
+		console.log(h); // 4
+		console.log(i); // 8
+
+		var [h = 4,i = 8] = [12,19];
+		console.log(h); // 12
+		console.log(i); // 19
+
+		// 函数的默认参数
+		function foo(k=3,l=6) {
+			console.log(k); // 3
+			console.log(l); // 6
+		}
+		foo();
+
+		function foo(k=3,l=6) {
+			console.log(k); // 11
+			console.log(l); // 22
+		}
+		foo(11,22);
+
+
+		//解构赋值的rest参数
+		var [m,n,o] = [1,2,3,4,5];
+		console.log(m); // 1
+		console.log(n); // 2
+		console.log(o); // 3
+
+		var [m,n,...o] = [1,2,3,4,5];
+		console.log(m); // 1
+		console.log(n); // 2
+		console.log(o); // [3,4,5]
+
+
+		//函数的rest参数
+		function foo(p,q) {
+			console.log(p); // 8
+			console.log(q); // 9
+		}
+		foo(8,9,10);
+
+		function bar(r,...s) {
+			console.log(r); // 8
+			console.log(s); // [9,10]
+		}
+		bar(8,9,10);
+
+
+		//函数的剩余参数不包含在函数的形参里面
+		function foz(t,u,...v) {
+			console.log(foz.length); // 2 函数的形参的个数
+			console.log(arguments.length); //4 函数的实参的个数
+		}
+		foz(1,2,3,4)
+
+
+
+		//箭头函数
+		// 函数表达式的写法
+		var foo = function(x) {
+			return x*x;
+		}
+		//箭头函数写法
+		var foo = x => x*x;
+		console.log(foo(12));
+
+		//两个参数以上需要用()括起来
+		var foz = (x,y) => x*x + y*y;
+		console.log(foz(4,8));
+
+		// 箭头函数跟普通函数的区别:
+		// 1.this的指向性问题
+		// 2.箭头函数不能访问arguments
+		// 3.不可以当作构造函数
+		document.onclick = function() {
+			setTimeout(function() {
+				console.log(this); // window
+			});
+		}
+		document.onclick = function() {
+			setTimeout(()=> {
+				console.log(this); //document
+			});
+		}
+
+		function bar1() {
+			console.log(arguments);
+		}
+		bar1();
+
+		// var bar2 = () => {
+		// 	console.log(arguments); //报错 arguments未定义
+		// }
+		// bar2();
+
+		// 异步：当代码执行到这里的时候,并不会立即触发,也不会影响到后续代码的执行
+		// 异步的问题：当回调函数过多的时候,函数嵌套太多,形成回调地狱,使代码难以阅读,后期也难以维护
+		// promise：异步变成的一种解决方案
+
+		// 回调地狱
+		setTimeout(function() {
+			console.log('1');
+			setTimeout(function() {
+				console.log('2');
+				setTimeout(function() {
+					console.log('3')
+					setTimeout(function() {
+						console.log('4');
+						setTimeout(function() {
+							console.log('5')
+						},200)
+					},200)
+				},200)
+			},200)
+		},200)
+
+		// 在没有promise之前,人们使用回调函数来解决问题
+
+		var a = 10;
+		function baz(fx) {
+			var a = 20; //局部变量
+			setTimeout(function() {
+				console.log('123');
+				fx();
+			});
+		}
+		baz(function() {
+			console.log(a);
+		})
+	</script>
+</body>
+</html>

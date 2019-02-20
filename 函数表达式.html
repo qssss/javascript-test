@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>javascript高级程序设计第七章《函数表达式》</title>
+</head>
+<style type="text/css">
+	li {
+		background-color: red;
+		margin-bottom:  10px;
+		width: 100px;
+		list-style: none;
+	}
+</style>
+<body>
+	<button id="btn">增加年龄</button>
+	<div id="someElement"></div>
+	<ul>
+		<li>1</li>
+		<li>2</li>
+		<li>3</li>
+		<li>4</li>
+		<li>5</li>
+	</ul>
+<script type="text/javascript">
+	//闭包
+	function createComparisonFunction(propertyName) {
+		return function(object1,object2) {
+			var value1 = object1[propertyName];
+			var value2 = object2[propertyName];
+			if(value1 < value2) {
+				return -1;
+			} else if (value1 > value2) {
+				return 1;
+			} else {
+				return 0;
+			}
+		}
+	}
+	var compare = createComparisonFunction(name);
+	var result = compare({name: 'Nicholas'},{name: "Greg"});
+
+	function compare(value1,value2) {
+		if(value1 < value2) {
+			return -1;
+		} else if (value1 >　value2) {
+			return 1;
+		} else {
+			return 0;
+		}
+	}
+	compare(5,10);
+
+	function createFunctions1() {
+		var result1 = new Array();
+		for(var i = 0;i < 10;i++) {
+			result1[i] = function() {
+				return i;
+			}();
+		}
+		return result1;
+	}
+
+	console.log(createFunctions1());//[0,1,2,3,4,5,6,7,8,9]
+	var arr1 = createFunctions1();
+	console.log(arr1[0]);
+	console.log(arr1[1]);
+	console.log(arr1[2]);
+	console.log(arr1[3]);
+	console.log(arr1[4]);
+
+	function createFunctions3() {
+		var result3 = new Array();
+		for(var i = 0;i < 10;i++) {
+			//result数组中存的是函数,每个函数的结果都是返回10
+			result3[i] = function() {
+				return i;
+			};
+		}
+		return result3;
+	}
+
+	console.log(createFunctions3());//[function,function,function,function,function,function,function,function,function,function]
+	
+	
+
+	function createFunctions2() {
+		var result2 = new Array();
+		for(var j = 0;j < 10;j++) {
+			result2[j] = function(num) {
+				return function() {
+					return num;
+				};
+			}(j);
+		}
+		return result2;
+	}
+
+
+	var arr2 = createFunctions2();
+	console.log(arr2[0]());
+	console.log(arr2[1]());
+	console.log(arr2[2]());
+	console.log(arr2[3]());
+	console.log(arr2[4]());
+	console.log(createFunctions2());
+	
+
+	var f = (function() {
+		var arr = [];
+		for(var i = 0;i<8;i++) {
+			arr[i] = function() {
+				// alert(i);
+			}()
+		}
+		return arr;
+	})();
+	
+
+	function A() {
+		var count = 0;
+		return function() {
+			count++;
+			console.log(count);
+		}
+	}
+	var C = A();
+	C();//1
+	C();//2
+	C();//3
+
+	//闭包
+	//1.函数作为返回值
+	function fn() {
+		var max = 10;
+		return function bar(x) {
+			if(x >　max) {
+				console.log(x)
+			}
+		}
+	}
+	var f1 = fn();
+	f1(15);
+	//2.函数作为参数传递
+	var max = 100;
+	var fn = function(x) {
+		if(x > max) {
+			return x;
+		}
+		console.log(x);
+	};
+	(function(f) {
+		var max = 10;
+		f(15);
+	})(fn);
+
+	function sayWangWang() {
+		var age = 18;
+		var btn = document.getElementById("btn");
+		var M = function S() {
+			// alert(age);
+		}
+		return M();
+	}
+	sayWangWang();
+
+
+	//7.2.2 关于this对象
+	var name = "The Window";
+	var object1 = {
+		name: "My Object",
+		getNameFunc: function() {
+			return function() {
+				return this.name;
+			}()
+		}
+	}
+	console.log(object1.getNameFunc()) // "The Window"
+
+	var name = "The window";
+	var object2 = {
+		name: "My Object",
+		getNameFunc: function() {
+			var that = this;
+			return function() {
+				return that.name;
+			}
+		}
+	}
+	console.log(object2.getNameFunc()()) // "My Object"
+
+	var name = "The Window";
+	var object3 = {
+		name: "My Object",
+		getNameFunc: function() {
+			return this.name;
+		}
+	}
+	console.log(object3.getNameFunc()) // "My Object"
+
+	// 7.2.3内存泄露
+	function assignHandler1() {
+		var element = document.getElementById("someElement");
+		// 因为该匿名函数包涵了对assignHandler1()活动对象的引用,因此它占用的内存永远不会被回收
+		element.onclick = function() {
+			alert(elememt.id);
+		}
+	}
+
+	function assignHandler1() {
+		var element = document.getElementById("someElement");
+		var id = element.id;
+		element.onclick = function() {
+			alert(id);
+		}
+		element = null;
+	}
+
+	// 7.3 模仿块级作用域
+	function outputNumbers1(count) {
+		for(var i = 0;i < count;i++) {
+			console.log(i);
+		}
+		console.log(i);
+	}
+	outputNumbers1(5);
+
+
+	function outputNumbers2(count) {
+		(function() {
+			for(var i = 0;i < count;i++) {
+				console.log(i);
+			}
+		})();
+		// console.log(i); //i is not defined;
+	};
+	outputNumbers2(8);
+
+	//没有指向匿名函数的引用,函数执行完毕之后，其作用域链接被销毁了,可以减少闭包占用的内存问题
+	(function() {
+		var date = new Date();
+		if(date.getMonth() == 0 && date.getDate() == 1) {
+			alert("Happy new year");
+		}
+	})();
+
+	// 7.4 私有变量
+	function add(num1,num2) {
+		var sum = num1 + num2;
+		return sum;
+	}
+
+	// 我们把有权访问私有变量和私有函数的公有方法称为特权方法
+	// 一、通过构造函数创造特权方法
+	function MyObject() {
+		//私有的变量和方法
+		var privateVariable = 10;
+		function privateFunction() {
+			return false;
+		}
+		//特权方法
+		this.publicMethod = function() {
+			privateVariable++;
+			return privateFunction();
+		}
+	}
+	var my = new MyObject();
+	my.publicMethod();
+
+
+
+	function Person(name) {
+		this.getName = function() {
+			return name;
+		}
+		this.setName = function(value) {
+			name = value;
+		}
+	}
+	var person = new Person("Amy");
+	console.log(person.getName()); // Amy
+	person.setName("Jack");
+	console.log(person.getName()); // Jack
+
+
+	//7.4.1静态私有变量
+	// 二、通过在私有作用域中定义私有变量和函数,也可以创建特权方法
+	(function() {
+		var privateVariable = 10;
+		function privateFunction() {
+			return false;
+		};
+		//构造函数
+		//函数声明只能创建局部函数，因此此处使用函数表达式
+		// 初始化未经声明的变量总是会创造一个全局变量
+		// 在严格模式下，给未经声明的变量赋值赋值会发生错误
+		MyObject = function() {
+
+		};
+		//共有/特权方法
+		MyObject.prototype.publicMethod = function() {
+			privateVariable++;
+			return privateFunction();
+		};
+	})();
+
+
+	(function() {
+		var name = "";
+		Person1 = function(value) {
+			name = value;
+		}
+		Person1.prototype.getName = function() {
+			return name;
+		}
+		Person1.prototype.setName = function(value) {
+			name = value;
+		};
+	})();
+
+	var person1 = new Person1("Nicholas");
+	console.log(person1.getName()); // Nicholas
+	person1.setName("Greg");
+	console.log(person1.getName()); // Greg
+
+	var person2 = new Person1("Michael");
+	console.log(person1.getName()); // Michael
+	console.log(person2.getName()); // Michael
+
+	// 7.4.2 模块模式
+	// 通过单例创建私有变量和特权方法
+	var singleton = function() {
+		// 私有变量和方法
+		var privateVariable = 10;
+		function privateFunction() {
+			return false;
+		}
+		// 特权和公有方法
+		return {
+			publicProperty: true,
+			publicMethod: function() {
+				privateVariable++;
+				return privateFunction();
+			}
+		}
+	}();
+	console.log(singleton.publicProperty); // true
+
+	var application = function() {
+		// 私有变量和函数
+		var components = new Array();
+		// 初始化
+		components.push(new BaseComponents());
+		// 公共
+		return {
+			getComponentCount: function() {
+				return components.length;
+			},
+			registerComponent: function(component) {
+				if(typeof component == "object") {
+					components.push(component)
+				}
+			}
+		}
+	}
+
+	// 7.4.3 增强的模块模式
+	// var singleton = function() {
+	// 	// 私有变量和私有函数
+	// 	var privateVariable = 10;
+	// 	function privateFunction() {
+	// 		return false;
+	// 	}
+	// 	// 创建对象
+	// 	var object = new CustomType();
+	// 	object.publicProperty = true;
+	// 	// 添加特权/共有属性和方法
+	// 	object.publicMethod = function() {
+	// 		privateVariable++;
+	// 		return privateFunction();
+	// 	};
+	// 	// 返回这个对象
+	// 	return object;
+	// }();
+
+	// var application = function() {
+	// 	// 私有变量和函数
+	// 	var components = new Array();
+	// 	// 初始化
+	// 	components.push(new BaseComponent());
+	// 	// 创建一个application的一个局部副本
+	// 	var app = new BaseComponent();
+	// 	// 公共接口
+	// 	app.getComponentCount = function() {
+	// 		return components.length;
+	// 	}
+	// 	app.rigesterComponent = function(component) {
+	// 		if(typeof component == "object") {
+	// 			components.push(component);
+	// 		}
+	// 	};
+	// 	// 返回这个副本
+	// 	return app;
+	// }();
+
+	var name = "the window"; 
+	var object = {
+		name: "the object",
+		getName: function() {
+			return this.name
+		}
+	};
+	console.log(object.getName());
+
+	/*js关于闭包的经典面试题*/
+	// 只需理解同步和异步的问题
+	// 一、方式一
+	window.onload = function() {
+		var li = document.getElementsByTagName("li");
+		// for循环不能形成作用域,函数才能形成作用域
+		for(var i = 0;i < li.length;i++) { 
+			// onclick只是在定义一个函数,真正的执行时间可能是很久以后了
+			li[i].onclick = function() { 
+				// click事件的监听器函数在被调用的时候,for循环已经执行完毕,因此输出的全部是5
+				alert(i); // 5,5,5,5,5
+			}
+		}
+	}
+
+	// 二、 方式二
+	window.onload = function() {
+		var li = document.getElementsByTagName("li");
+		for(var i = 0;i < li.length;i++) {
+			//在每次for循环的时候,i就被传到了事件监听函数,作为局部变量被保存了下来,显然每次传入进来的i不一样,这里的i是同步保存下来的,而不是异步去取的,因此这里的i和for循环中的i并不是同一个值,只是名字相同罢了
+			li[i].onclick = (function(n) {
+				return function() {
+					alert(n); // 0,1,2,3,4
+				}
+			})(i);
+		}
+	}
+
+	// 三、方式三
+	window.onload = function() {
+		var li = document.getElementsByTagName("li");
+		for(var i = 0;i < li.length;i++) {
+			li[i].onclick = function() {
+				console.log(i); // 在for循环的时候直接执行输出0,1,2,3,4
+			}();
+		}
+	}
+
+	function outputNumber(count){
+		
+			for(var i = 0; i < count; i++) {
+				alert(i);	
+			}
+		
+		alert(i);
+	};
+	outputNumber(8)
+</script>	
+</body>
+</html>

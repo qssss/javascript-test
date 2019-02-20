@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<div id="param">接口调用的设计原则</div>
+	<table>
+		<!--fn13 js线程-->
+		<tr>
+			<td><button id="do">一段长的bad计算</button></td>
+			<td><div id="status">尚未开始计算</div></td>
+		</tr>
+		<tr>
+			<td><button id="do_ok">一段短的good计算</button></td>
+			<td><div id="status_ok">尚未开始计算</div></td>
+		</tr>
+	</table>
+<script type="text/javascript">
+//fn1
+	function fire1() {
+		document.write(this + "<br/>");
+	}
+	fire1();
+
+//fn2
+	function fire2() {
+		function innerfire2() {
+			document.write(this + "<br/>");
+		}
+		innerfire2()
+	}
+	fire2();
+
+//fn3
+	var obj1 = {
+		fire3() {
+			function innerfire3() {
+				document.write(this === window)
+			}
+			innerfire3();
+		}
+	}
+	obj1.fire3();
+
+//fn4
+	var obj2 = {
+		a : 1,
+		fire4() {
+			//this被隐式的绑定在了对象上
+			document.write("<br/>" + this.a);
+		}
+	}
+	obj2.fire4();
+
+
+//fn5
+	function fire5() {
+		document.write("<br/>" + this.a)
+	}
+	var obj3 = {
+		a: 3,
+		fire5 : fire5
+	}
+	obj3.fire5();
+
+
+//fn6
+	var obj4 = {
+		a : 6,
+		fire6() {
+			document.write("<br/>" + this.a);
+		}
+	}
+	var a = 8;
+	var func1 = obj4.fire6;
+	var func2 = function() {
+		func1.call(obj4);
+	}
+	func1();
+	func2();
+
+
+//fn7
+	function foo(a) {
+		this.a = a;
+	}
+	var a1 = new foo(2);
+	document.write("<br/>" + a1.a)
+
+
+//fn8
+	function setColor(selector,color) {
+		var el = document.querySelector(selector);
+		if(typeof color !=="string") {
+			return
+		}
+		el.style.color = color;
+		return el;
+	}
+	setColor("#param","red");
+
+
+//fn9
+	function getElement(selector) {
+		this.style = document.querySelector(selector).style;
+	}
+	getElement.prototype.color = function(color) {
+		this.style.color = color;
+		return this;
+	}
+	getElement.prototype.fontSize = function(size) {
+		this.style.fontSize = size;
+		return this;
+	}
+	getElement.prototype.backgroundColor = function(bg) {
+		this.style.backgroundColor = bg;
+		return this;
+	}
+	var param = new getElement("#param");
+	param.fontSize("40px").color("blue").backgroundColor("red");
+
+
+//fn10
+	function fire6() {
+		document.write(" " + "<br/>" + this.a2)
+	}
+	/*---------------------------------------将函数挂载到对象上---------------------------------------------*/
+	var obj5 = {
+		fire6: fire6
+	}
+	/*-------------此处的值是undefined,因为变量a的值在函数执行的时候尚未被定义,如果值在函数fire6()之前定义,值方为2-------------------------------*/
+	fire6();
+	/*-------------将函数添加到一个对象中的时候，函数是作为一个属性添加到对象中的，因此不能写成obj.fire6()---------------------------------------*/
+	var fire7 = obj5.fire6;
+	var a2 = 2;
+	obj5.a2 = 1;
+	obj5.fire6();//1
+	fire7()//值为2，此处对象内部的this值丢失,此处显示的是全局中的this值
+	fire7.call(obj5);//1
+
+
+//fn11
+	/*-------------------------------------js如何优雅的将多个方法添加到window方法中----------------------------------*/
+	//js写法
+	var defining = {
+		fire8: function() {
+			document.write("<br/>" + "window.fire8");
+		},
+		fire9: function() {
+			fire8();
+			document.write("<br/>" + "window.fire9");
+		},
+		fire10: function() {
+			document.write("window.fire9");
+		}
+	}
+	Object.keys(defining).forEach(key => {
+		window[key] = defining[key];
+	})
+	fire9();
+	//jquery方法
+	// $.extend(window,{
+	// 	fire8: function() {},
+	// 	fire9: function() {},
+	// 	fire10: function() {}
+	// })
+
+
+//fn12
+/*-----------------------------------简单粗暴的理解js原型链-----------------------------------------------------*/
+	function Person(name) {this.name = name};
+	function Mother() {};
+	Mother.prototype = {
+		name: 18,
+		home: ["北京","上海"]
+	};
+	Person.prototype = new Mother();
+	var p1 = new Person("jack");
+	var p2 = new Person("Mark");
+	p1.age = 20; //实例不能呢个改变原型的基本值属性
+	p1.home[0] = "武汉";//原型属性的共享 原型属性会改变
+	p1.home = ["广州","深圳"];//等同于p1.age
+	delete p1.age; //删除实例的属性,原本被覆盖的原型值出现
+	Person.prototype.lastName = "Jin"; //往Person原型中添加一个属性,等同于Mother.lastname,并不是mother.prototype.lastname
+	Person.prototype = {
+		age: 28,
+		address: {
+			country: "USA",
+			city: "Washington"
+		}
+	};
+	var p3 = new Person("obama");
+	Mother.prototype.no = 9527;
+	//改写原型的原型,此时Mother与Person已经脱离关系了,mother的变化无法影响到Person
+	Mother.prototype = {
+		car: 2,
+		hobby: ["run","walk"]
+	};
+	var p4 = new Person("Tony");
+	//如果需要应用mother原型,那么就要重新将Person绑定到mother上
+	Person.prototype = new Mother();
+	var p5 = new Person("Luffy");
+
+	//组合继承
+	function Mother(age) {
+		this.age = age;
+		this.hobby = ["running","football"];
+	}
+	Mother.prototype.showAge = function() {
+		console.log(this.age);
+	}
+	function Person(name,age) {
+		Mother.call(this,age); //第二次执行
+		this.name = name;
+	}
+	Person.prototype = new Mother(); //第一次执行
+	//constructor属性返回对创建此对象的数组函数的引用
+	Person.prototype.constructor = Person;
+	Person.prototype.showName = function() {
+		console.log(this.name);
+	}
+	var p6 = new Person('Rose',20);
+	p6.hobby.push("basketball");
+	var p7 = new Person('Mark',18);
+
+	//寄生组合继承
+	function object(o) {
+		function F() {};
+		F.prototype = o;
+		return new F();
+	}
+	function inheritPrototype(Person,Mother) {
+		var prototype = object(Mother.prototype);
+		prototype.constructor = Person;
+		Person.prototype = prototype;
+	}
+	function Mother(age) {
+		this.age = age;
+		this.hobby = ["running","football"]
+	}
+	Mother.prototype.showAge = function() {
+		console.log(this.age);
+	}
+	function Person(name,age) {
+		Mother.call(this,age);
+		this.name = name;
+	}
+	inheritPrototype(Person,Mother);
+	Person.prototype.showName = function() {
+		console.log(this.name);
+	}
+	var p9 = new Person("Jack",25);
+	p7.hobby.push("basketball");
+	var p10 = new Person("Mark",19);
+
+	//创建对象的几种方式
+	//原始模式
+	//对象字面量模式
+	var person1 = {
+		name: "Jack",
+		age: 18,
+		sayName: function() {
+			console.log(this.name);
+		}
+	}
+
+	//Object构造函数模式
+	var person1 = new Object();
+	person1.name = "Jack";
+	person1.age = 18;
+	person1.sayName = function() {
+		console.log(this.name);
+	}
+
+	//工厂模式 批量生产
+	function createPerson(name,age) {
+		var person1 = new Object();
+		person1.name = name;
+		person1.age = age;
+		person1.sayName = function() {
+			console.log(this.name)
+		}
+		return person1;
+	}
+
+	//构造函数
+	function person1(name,age) {
+		this.name = name;
+		this.age = age;
+		this.sayName = function() {
+			alert(this.name);
+		}
+	}
+	var p8 = new person1("obo",18); //创建对象,将构造函数的作用域赋值给新创建的对象,即将this赋值给新创建的对象
+	person1('obo',18); //所有的构造函数实例都有一个construtor属性,指向构造函数本身
+
+	//原型模式
+	//直接定义prototype属性
+	function person1() {
+		person1.prototype.name = "jack";
+		person1.prototype.age = 18;
+		person1.prototype.sayName = function() {
+			console.log(this.name);
+		}
+	}
+	//字面量形式定义显示
+	function person1() {
+
+	}
+	person1.prototype = {
+		name: "jack",
+		age: 18,
+		sayName: function() {
+			console.log(this.name)
+		}
+	};
+	var p1 = new person1();
+	var p2 = new person1();
+
+	//混合模式(构造+原型) 
+	//将需要独立的属性和方法放在构造函数中，而其它可以共享的部分则发那个在原型中，这样可以最大程度的节省内存而又保持对象的独立性
+	function person1(name,age) {
+		this.name = name;
+		this.age =age;
+	}
+	person1.prototype = {
+		hobby: ["running","writing"],
+		sayName: function() {
+			console.log(this.name);
+		},
+		sayAge: function() {
+			console.log(this.age);
+		}
+	}
+
+
+//fn13 
+	//https://www.cnblogs.com/fly-snow/p/5427865.html
+	// alert(1);
+	// setTimeout("alert(2)",0);
+	// alert(3);
+	//执行的先后顺序是1-3-2
+
+	//这是一个死循环，证明js引擎是单线程的，settimeout不能作为多线程使用
+	// var isEnd = true;
+	// setTimeout(function() {
+	// 	isEnd = false;
+	// },1000);
+	// while(isEnd);
+	// alert("end")
+	function long_running(status_div) {
+		var result = 0;
+		for(var i = 0;i < 1000;i++) {
+			for(var j = 0;j < 700;j++) {
+				for(var k = 0;k < 300;k++) {
+					result = result + i + j + k;
+				}
+			}
+		}
+		document.querySelector(status_div).innerHTML = "计算完毕"
+	}
+	document.querySelector("#do").onclick = function() {
+		//缺少了正在计算中...
+		document.querySelector("#status").innerHTML = "正在计算中...";
+		long_running("#status");
+	}
+	document.querySelector("#do_ok").onclick = function() {
+		document.querySelector("#status_ok").innerHTML = "正在计算中...";
+		setTimeout(function(){
+			long_running("#status_ok")
+		},0)
+	}
+
+//fn14 
+	//while的使用
+	var numbers = [52,35,46,25,36,8,91,25];
+	var even = [];
+	var odd = [];
+	while(numbers.length > 0) {
+		var number = numbers.pop()//pop删除并返回数组的最后一个元素
+		if(number % 2 > 0)  {
+			even.push(number);
+		}
+		else {
+			odd.push(number);
+		}
+	}
+	document.write("<br/>" + even);
+	document.write("<br/>" + odd);
+
+//fn15 https://www.cnblogs.com/onepixel/p/5062456.html
+//关于javasript闭包的了解
+/***************当一个内部函数被其外部函数之外的函数引用时，就形成了闭包**************************************************/
+	function A() {
+		var count = 0;
+		function B() {
+			count++;
+			document.write("<br/>" + "闭包" + count)
+		}
+		return B;
+	}
+	var C = A();
+	C();//1
+	C();//2
+	C();//3
+	//原版
+	(function(document) {
+		var viewport;
+		var obj = {
+			init: function(id) {
+				viewport = document.querySelector("#" + id)
+			},
+			addChild: function(child) {
+				viewport.appendChild(child);
+			},
+			removeChild: function() {
+				viewport.removeChild(child)
+			}
+		}
+		window.jView = obj;
+	})(document);
+    //改版
+    var fn = function(document) {
+    	var viewport;
+    	var obj = {
+    		init: function(id) {
+    			viewport = document.querySelector("#" + id)
+    		},
+    		addChild: function(child) {
+    			viewport.appendChild(child);
+    		},
+    		removeChild: function() {
+    			viewport.removeChild(child)
+    		}
+    	}
+    	window.jView = obj;
+    };
+    fn(document);
+</script> 
+
+</body>
+</html>

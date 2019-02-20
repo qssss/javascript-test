@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<style type="text/css">
+	#box {
+		position: absolute;
+		left: 500px;
+		top: 400px;
+		width: 100px;
+		height: 100px;
+		background-color: red;
+	}
+</style>
+<body>
+	<div id="box"></div>
+	<script type="text/javascript">
+		// 方案一
+		var box = document.getElementById("box");
+		// document.onkeydown = function(e) {
+		// 	switch(e.keyCode) {
+		// 		case 37:
+		// 			box.style.left = box.offsetLeft - 10 + "px"
+		// 			break;
+		// 		case 38:
+		// 			box.style.top = box.offsetTop - 10 + "px"
+		// 			break;
+		// 		case 39:
+		// 			box.style.left = box.offsetLeft + 10 + "px"
+		// 			break;
+		// 		case 40:
+		// 			box.style.top = box.offsetTop + 10 + "px"
+		// 			break;	
+		// 	}
+		// }
+		// 方案二：解决鼠标连续按下初始时候的拉顿现象,利用定时器的连续触发,来解决onkeydown的连续触发问题
+		var timer = null;
+		var flag = true;
+		document.onkeydown = function(e) {
+			switch(e.keyCode) {
+				case 37:
+					keyCode = 37;
+					break;
+				case 38:
+					keyCode = 38;
+					break;
+				case 39:
+					keyCode = 39;
+					break;
+				case 40:
+					keyCode = 40;
+					break;
+			}
+			if(flag) {
+				timer = setInterval(runbox,30);
+				flag = false;
+			}
+		}
+
+		document.onkeyup = function() {
+			clearInterval(timer);
+			flag = true;
+		}
+
+		function runbox() {
+			switch(keyCode) {
+				case 37:
+					box.style.left = box.offsetLeft - 10 + 'px'
+					break;
+				case 38:
+					box.style.top = box.offsetTop - 10 + 'px'
+					break;
+				case 39:
+					box.style.left = box.offsetLeft + 10 + 'px'
+					break;
+				case 40:
+					box.style.top = box.offsetTop + 10 + 'px'
+					break;
+			}
+		}
+	</script>
+</body>
+</html>

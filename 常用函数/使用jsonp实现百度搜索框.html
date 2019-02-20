@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<style type="text/css">
+	#input {width: 300px;height: 30px;padding: 5px;border: 1px solid #f90;font-size: 16px;}
+	#oul {width: 310px;margin:0;padding: 0;border: 1px solid #f90;}
+	#oul li {height: 35px;line-height: 35px;padding: 0 10px;}
+	#oul li a {color: #333;text-decoration: none;}
+	#oul li:hover {background-color: #f90;cursor: pointer;}
+	#oul li:hover a {color: #fff;}
+</style>
+<body>
+	<input type="text" name="" id="input">
+	<ul id="oul">
+		<li><a href="javascript:;">百度</a></li>
+		<li><a href="javascript:;">百度</a></li>
+		<li><a href="javascript:;">百度</a></li>
+		<li><a href="javascript:;">百度</a></li>
+	</ul>
+</body>
+<script type="text/javascript">
+	window.onload = function() {
+		function func(data) {
+			console.log(data)
+		}
+		var input = document.getElementById('input');
+		var oul = document.getElementById('oul');
+		input.onkeyup = function() {
+			var script = document.createElement('script');
+			script.src="http://suggestion.baidu.com/su?wd="+ input.value + '&cb='+func;
+			document.body.appendChild(script);
+		}
+	}
+</script>
+</html>

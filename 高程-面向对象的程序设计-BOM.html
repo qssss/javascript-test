@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<style type="text/css">
+	html,body {height: 100%;}
+</style>
+<!-- frmameset参数：
+rows 水平分隔线 将画面上下分隔 
+cols 垂直分隔线 将画面左右分隔 
+frameborder 是否设置框架边框 0表示不设置 1表示设置
+border 设置框架边框的宽度 用像素表示
+bordercolor 设置框架边框的颜色
+framespacing 框架与框架间的保留空白距离
+
+
+frame参数：
+src 窗框要显示的网页名称 绝对或者相对路径都可
+name 窗框的名称 这样才能制定框架来作连接  必须设置但是任意命名
+frameborder 设定框架的边框，其值只有0和1,0表示不要边框,1 表示要显示边框
+framespacing 表示框架与框架间的保留空白的距离
+bordercolor 设定框架的边框颜色
+scrolling 设定是否要显示卷轴,YES 表示要显示卷轴,NO 表示无论如何都不要显示,AUTO是视情况显示
+noresize    设定不让使用者可以改变这个框框的大小，亦没有设定此参数，使用者可以很随 意地拉动框架，改变其大小。
+marginhight   表示框架高度部份边缘所保留的空间
+marginwidth   表示框架宽度部份边缘所保留的空间 -->
+
+<!-- <frameset rows="160,*" frameborder="1" border="1px" bordercolor="#863292" framespacing="5">
+	<noframes>
+		<body>您的浏览器暂时不支持框架功能,请升级您的浏览器</body>
+	</noframes>
+	<frame src="frame.htm" name="topFrame" ></frame>
+	<frameset cols="50%,50%">
+		<frame src="anotherframe.htm" name="leftFrame"></frame>
+		<frame src="yetanotherframe.htm" name="rightFrame"></frame>
+	</frameset>
+
+</frameset> -->
+<input type="button" name="btn1" value="打开新窗口" onclick="Fun1()">
+<input type="button" name="btn2" value="移动新窗口" onclick="Fun2()">
+<script type="text/javascript">
+	/*----------------------------------------------------------------window-----------------------------------------------------------------------*/
+	/*所有在全局环境下定义的变量和函数都是window对象的属性和方法 
+	但是在全局定义的属性不能通过delete删除
+	而通过window定义的属性是可以通过delete删除*/
+	window.age = 19;
+	delete age;
+	// console.log(age) //age is not defined
+
+	var color = 'red';
+	delete color;
+	console.log(color); //red
+ 	
+
+	//通过查询window对象 可以查看属性是否被声明
+	console.log(window.name)
+	//无法精确查出窗口距离屏幕左边和上边的距离
+	var leftpos = (typeof window.screenLeft == 'number'? window.screenLeft : window.screenX);
+	var toppos = (typeof window.screenTop == 'number'? window.screenTop : window.screenY);
+	console.log(leftpos);
+	console.log(toppos);
+	console.log(window.screenLeft); //firefox 中不支持 用screenX代替
+	console.log(window.screenTop); //firefox 中不支持 用screenY代替
+
+	// console.log(window.screenX); 
+	// console.log(window.screenY);
+	
+
+	function Fun1() {
+		mywindow = window.open('https://www.baidu.com','baidu','width=200,height=300')
+	}
+	function Fun2() {
+		mywindow.moveTo(200,200)
+	}
+	//判断当前网页的渲染模式 
+	// BackCompat 怪异模式
+	// CSS1Compat 标准模式
+	console.log(document.compatMode);
+
+	// 弹出窗口屏幕程序 浏览器内置程序屏蔽返回null 拓展或者其他程序阻止会抛出错误
+
+	var blocked = false;
+	
+	try {
+		var newwindow = window.open('https://www.baidu.com/');
+		if(newwindow == null) {
+			blocked = true;
+		}
+	} catch(ex) {
+		blocked = true;
+	}
+
+	if(blocked) {
+		console.log('the popup was blocked');
+	}
+
+	console.log(navigator.appCodeName);
+
+
+	//间歇调用
+
+	// var num = 0;
+	// var max = 10;
+	// var time = null;
+	// function increceNum() {
+	// 	if(num < max) {
+	// 		num++;
+	// 		console.log(num);
+	// 		setTimeout(increceNum,500);
+	// 	} else {
+	// 		console.log('done')
+	// 	}
+	// }
+	
+	// setTimeout(increceNum,500);
+
+	// alert 警告框
+	// confirm 确认狂 确认 取消
+	// prompt 提示框  第一个参数是显示给用户的文本  第二个参数是对文本的默认回答
+
+	// var res = confirm('are you sure');
+	// if(res) {
+	// 	alert('你点击了确定')
+	// } else {
+	// 	alert('你点击了取消')
+	// }
+
+	// var name = prompt('您的名字是？','黄丽娟');
+	// if(name != null) {
+	// 	alert('您的名字是' + name);
+	// } else {
+	// 	alert('您没有选择您的名字');
+	// }
+
+
+	/*----------------------------------------------------------------location-----------------------------------------------------------------------*/
+	console.log(window.location)
+
+	//浏览器地址中查询参数的获取
+	var qs = {};
+	function getQuerySelector() {
+		var sear = location.search.substring(1);
+		var res = sear.split('&'); // split将字符串转化为数组 并按指定分隔符分隔
+		for(var i = 0;i < res.length;i++) {
+			var items = res[i].split('=');
+			var name = items[0];
+			var value = items[1];
+			qs[name] = value; //添加对象的方法
+		}
+		return qs;
+	}
+
+	// location.assign('https://www.baidu.com') 改变浏览器的位置 和显示使用loaction.href = 'https://www.baidu.com' 一样
+
+	// location.replace('https://www.baidu.com') 浏览器位置会变 但是不会在生成历史记录 所以不能点击返回按钮进行返回
+
+	// location.reload() 重新加载页面 从缓存中加载 如果不希望从缓存中加载的话 传入参数true
+
+
+	/*----------------------------------------------------------------navigator-----------------------------------------------------------------------*/
+
+	//检测插件用plugins数组
+	//其它浏览器
+	function hasPlugins(name) {
+		var name = name.toLowerCase();
+		for(var i = 0; i < navigator.plugins.length;i++) {
+			if(navigator.plugins[i].name.toLowerCase().indexOf(name) > -1) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	//ie浏览器
+	function hasIEPlugins(name) {
+		try {
+			new ActiveXOject(name);
+			return ture;
+		} catch(ex) {
+			return false;
+		}
+	}
+
+	//检测所有的浏览器是否安装了falsh
+
+	function hasFlash(name) {
+		var result = hasPlugins('Flash');
+		if(!result) {
+			result = hasIEPlugins('ShockwaveFlash.ShockwaveFlash');
+		}
+		return result;
+	}
+
+	console.log(hasPlugins('Flash'));
+	console.log(hasIEPlugins('ShockwaveFlash.ShockwaveFlash'));
+
+	/*----------------------------------------------------------------screen-----------------------------------------------------------------------*/
+
+
+
+	/*----------------------------------------------------------------history-----------------------------------------------------------------------*/
+
+	// history.go(1);
+	// history.go(-1);
+	// history.go('www.baidu.com') //跳转到历史记录中包含该字符串的最近的页面
+	// history.back();
+	// history.forward();
+	if(history.length == 0) {
+		console.log('用户首先就打开了这个页面');
+	}
+
+
+</script>	
+</html>

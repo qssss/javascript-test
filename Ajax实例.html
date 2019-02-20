@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Ajax实例</title>
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+</head>
+<body>
+	<div class="container">
+		<div class="row">
+			<h2>员工查询</h2>
+			<div class="form-group">
+				<label>请输入员工编号:</label>
+				<input type="text" name="" id="keyword" class="form-control">
+			</div>
+			<button id="search" class="btn btn-primary">查询</button>
+			<p id="searchResult" style="margin-top: 10px;">查询结果是:</p>
+		</div>
+		<div class="row">
+			<h2>员工创建</h2>
+			<div class="form-group">
+				<label>请输入员工姓名:</label>
+				<input type="text" id="staffName" class="form-control">
+			</div>
+			<div class="form-group">
+				<label>请输入员工编号:</label>
+				<input type="text" id="staffNumber" class="form-control">
+			</div>
+			<div class="form-group">
+				<label>请输入员工性别:</label>
+				<select id="staffSex" class="form-control">
+					<option selected="">男</option>
+					<option>女</option>
+				</select>
+			</div>
+			<div class="form-group">
+				<label>请输入员工职位:</label>
+				<input type="text" id="staffJob" class="form-control">
+			</div>
+			<button id="save" class="btn btn-primary">保存</button>
+			<p id="createResult" style="margin-top: 10px;">创建结果是:</p>
+		</div>
+	</div>
+<script type="text/javascript" src="js/jquery-1.9.1.js"></script>
+<script type="text/javascript">
+
+	//js实现
+	window.onload = function() {
+		var	searchResult = document.getElementById("searchResult");
+		var	searchBtn = document.getElementById("search");
+		var	saveBtn = document.getElementById("save");
+		var	createResult = document.getElementById("createResult");
+		//	get请求
+		searchBtn.onclick = function() {
+			var keyword = document.getElementById("keyword");
+			var request = new XMLHttpRequest();
+			request.open("get","service.php?number=" + keyword.value);
+			request.send();
+			request.onreadystatechange = function() {
+				if(request.readystate == 4) {	//请求是否发送完毕
+					if(request.status == 200) {	//请求是否成功
+						searchResult.innerHTML = request.responseText;
+					} else {
+						alert("发生错误" + request.status)
+					}
+				}
+			}
+		}
+		//POST请求
+		saveBtn.onclick = function() {
+			var	staffName = document.getElementById("staffName").value;
+			var	staffNumber = document.getElementById("staffNumber").value;
+			var	staffSex = document.getElementById("staffSex").value;
+			var	staffJob = document.getElementById("staffJob").value;
+			var request = new XMLHttpRequest();
+			request.open("POST","service.php");
+			var data = "name=" + staffName + "&number=" + staffNumber + "&sex=" + staffSex + "&job=" + staffJob;
+			request.setRequestHeader("Content-Type","application/x-www-form-unlencoded")
+			request.send(data);
+			request.onreadystatechange = function() {
+				if(request.readystate == 4) {	//请求是否发送完毕
+					if(request.status == 200) {	//请求是否成功
+						createResult.innerHTML = request.responseText;
+					} else {
+						alert("发生错误" + request.status)
+					}
+				}
+			}
+		}
+	}
+
+	//jquery实现
+
+	$(document).ready(function() {
+		//get请求
+		$("#search").click(function() {
+			$.ajax({
+				type: 'get',
+				url: 'service.php?number=' + $("#keyword").val(),
+				dataType: 'json',
+				success: function(data) {
+					if(data.success) {
+						$("#searchResult").html(data.msg);
+					} else {
+						$("#searchResult").html("出现错误" + data.msg);
+					}
+				},
+				error: function(jqXHR) {
+					alert("发生错误" + jqXHR.status)
+				}
+			})
+		})
+
+		//POST请求
+		$("#search").click(function() {
+			$.ajax({
+				type: 'post',
+				url: 'service.php',
+				data: {
+					name: $("#staffName").val(),
+					number: $("#staffNumber").val(),
+					sex: $("#staffSex").val(),
+					job: $("#staffJob").val(),
+				},
+				dataType: 'json',
+				success: function(data) {
+					if(data.success) {
+						$("#createResult").html(data.msg)
+					} else {
+						$("#createResult").html("发生错误" + data.msg)
+					}
+				},
+				error: function(jqXHR) {
+					alert("发生错误" + jqXHR.status)
+				}
+			})
+		})
+	})
+	
+</script>
+</body>
+</html>

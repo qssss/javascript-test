@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<textarea cols="40" rows="6" id="trea1"></textarea>
+	<textarea cols="40" rows="6" id="trea2"></textarea>
+	<button id="btn">替换文本</button>
+	<script type="text/javascript">
+
+		// 1.match的应用：用正则去匹配字符串，如果匹配成功就返回匹配成功的一个数组，如果匹配失败就返回null
+
+		/* 将字符串中的连续数字提取出来并存放在数组中*/
+
+		/*普通方式*/
+
+		function reg1() {
+			var str1 = 'aghda3478shjk77fjhk3082hjkjh098';
+			var result1 = [];
+			var temp1 = '';
+			for(var i = 0;i < str1.length;i++) {
+				if(str1.charAt(i) >= 0 && str1.charAt(i) <= 9) {
+					temp1 += str1.charAt(i); 
+				} else {
+					if(temp1) {
+						result1.push(temp1);
+						temp1 = '';
+					}	
+				}
+			}
+			if(temp1) {
+				result1.push(temp1);
+			}
+			return result1;	
+		}
+		console.log(reg1()); 	 //["3478", "77", "3082", "098"]
+
+
+		/*正则表达式方式*/
+
+		function reg2() {
+			var str2 = 'aghda3478shjk77fjhk3082hjkjh098';
+			var re2 = /[0-9]+/g
+			var result2 = str2.match(re2);
+			return result2;		
+		}
+		console.log(reg2())		//["3478", "77", "3082", "098"]
+
+
+
+		// 2.search的应用：用正则表达式去匹配字符串，如果匹配成功，就返回匹配值在字符串中首次出现的位置，如果匹配失败就返回-1
+
+		function re3() {
+			var re3 = /roi/;
+			var str = 'hadafghajkgfafguieyroiwqy';
+			var result3 = str.search(re3);
+			return result3;
+		}
+		
+		console.log(re3());   // 19
+
+
+
+
+		//	3.test的应用：用字符串去匹配正则，如果匹配成功返回true，如果匹配失败返回false;
+
+		function re4() {
+			var re4 = /hello/;
+			var str4 = 'hello world';
+			var result5 = re4.test(str4);
+			return result5;
+		}
+		console.log(re4());	//true
+
+
+		// 4.replace的应用：用正则去匹配字符串，如果匹配成功，就将匹配成功的值替换成指定的值，如果匹配失败，则不进行任何的操作
+
+		function re5() {
+			var re5 = /hello/;
+			var str = 'hello world';
+			var result5 = str.replace(re5,'hi');
+			return result5;
+		}
+		console.log(re5()); // hi world
+
+
+		// replace()的第一个参数是正则表达式，第二个参数可以是字符串也可以是函数，函数的第一个参数是匹配的结果，第二个参数是第一个子项，第三个参数是第二个子项
+
+		function re6() {
+			var trea1 = document.getElementById('trea1');
+			trea1.innerHTML = '元首交往是两国关系的晴雨表，也是世界政治的观象台。习主席与“上合伙伴”聊了些什么？他们处得怎么样？给这个世界带来了怎样的影响？透过这74场会晤，可以观察到许多有意思的信息。'
+			var trea2 = document.getElementById('trea2');
+			var btn1 = document.getElementById('btn');
+			var re6 = /国|世界/g;
+			btn1.onclick = function() {
+				trea2.innerHTML = trea1.value.replace(re6,function($0) {
+					var result6 = '';
+					for(var i = 0;i <　$0.length;i++) {
+						result6 += '*'
+					}
+					return result6;
+				})
+			}
+		}
+		re6();
+
+		function re7() {
+			var str7 = 'hdi8kdjkf8fdd8js';
+			var re7 = /[a-z](?=8)/g;
+			var result8 = str7.match(re7);
+			return result8;
+		}
+		console.log(re7()); // ["i", "f", "d"]
+
+		/*
+			\d -> 数字
+			\D -> 非数字
+			\s -> 空白符
+			\S -> 非空白符
+			\w -> 字符（字母、数字、下划线）
+			\W -> 非字符
+			？= -> 匹配任何其后紧跟指定字符串的字符串
+			？! ->  匹配任何其后没有紧跟指定字符串的字符串
+			 ^  ->  匹配任何以指定字符开头的
+		*/
+
+		/*
+			量词：匹配的位数
+
+			+  	-> 	 匹配至少1位
+			*	->   匹配至少0位
+			? 	-> 	 匹配0位或者1位
+
+
+			这三个符号只是简写，量词{}
+
+			{0,}  匹配至少0个
+			{1,}  匹配至少1个
+			{0,1} 匹配0个或者1个
+			{4} 匹配4个
+			{5，11} 匹配至少5个，至多11个
+
+		*/
+		
+	</script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Promise案例</title>
+</head>
+<style type="text/css">
+	#div1 {
+		width: 100px;
+		height: 100px;
+		border: 1px solid green;
+	}
+</style>
+<body>
+	<div id="div1"></div>
+	<script type="text/javascript">
+		// function getShort() {
+		// 	var index = 0;
+		// 	//假设最短的那一列是第一列
+		// 	var iH = olis[index].offsetHeight;
+		// 	for(var i = 0;i<olis.length;i++) {
+		// 		if(olis[i].length < iH) {
+		// 			iH = olis[i].offsetHeight;
+		// 			index = i;
+		// 		}
+		// 	}
+		// 	return index;
+		// }
+
+	// 需求:
+	// 	实现一个洗菜做饭 -> 坐下来吃饭 -> 洗碗收拾桌子的步骤	
+		let state = 1; //模拟成功与失败	
+		function step1(resolve,reject) {
+			console.log('1.开始洗菜做饭')
+			if(state == 1) {
+				resolve('洗菜做饭-成功')
+			} else {
+				reject('洗菜做饭-失败')
+			}
+		}
+		function step2(resolve,reject) {
+			console.log('2.开始坐下来吃饭')
+			if(state == 1) {
+				resolve('开始坐下来吃饭-成功')
+			} else {
+				reject('开始坐下来吃饭-失败')
+			}
+		}
+		function step3(resolve,reject) {
+			console.log('3.开始洗完收拾桌子')
+			if(state == 1) {
+				resolve('洗完收拾桌子-成功')
+			} else {
+				reject('洗完收拾桌子-失败')
+			}
+		}
+		new Promise(step1).then(function(val) {
+			console.log(val);
+			return new Promise(step2);
+		}).then(function(val) {
+			console.log(val);
+			return new Promise(step3);
+		}).then(function(val) {
+			console.log(val)
+		})
+
+		window.onload = function() {
+			var xhr = new XMLHttpRequest();
+			xhr.open('get','http://api.douban.com/book/subjects?q=javascripts&alt=json&mac-result=1');
+			xhr.send();
+			xhr.onreadystatechange = function() {
+				if(xhr.readystate == 4) {
+					console.log(xhr.responseText)
+				}
+			}
+		}
+	</script>
+</body>
+</html>

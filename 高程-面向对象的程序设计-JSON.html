@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<script type="text/javascript">
+		//简单值
+		// "hello world!"
+
+
+		//对象
+		// {
+		//  	"name":'hhh',
+		//  	"age": 18,
+		//  	"school": {
+		//  		"name": "xxx",
+		//  	}
+		// }
+
+
+		//数组 
+		// ["name","age",true]
+
+		
+		var arr = [
+			{
+				"name" : "xxx",
+				"age" : 18,
+				"authors": [
+					"xxx","xxx"
+				]
+			},
+			{
+				"name" : "xxx",
+				"age" : 18,
+				"authors": [
+					"xxx","xxx"
+				]
+			}
+		];
+
+		var book = {
+			name: 'xiix',
+			age: 18,
+			edition: 3,
+			authors: [
+				"xxx"
+			]
+		}
+		// var arr2 = JSON.stringify(arr);
+		// console.log(arr2);
+
+		var bookjs = JSON.stringify(book);
+		console.log(bookjs); //json
+		var booksjson = JSON.parse(bookjs);
+		console.log(booksjson);//字符串
+
+		// JSON.stringify(value: any, replacer?: any, space?: any);
+		// JSON.parse(json: string)
+
+
+		// JSON.stringify序列化 可以接受第三个参数 第二个参数可以是数组也可以是函数 第三个参数表示是否在json字符串中保持缩进
+		var a1 = JSON.stringify(book, ["name","edition"]);
+		console.log(a1);
+
+		var a2 = JSON.stringify(book, function(key,value) {
+			switch (key) {
+				case 'name':
+					return '哈哈';
+					break;
+				case 'age':
+					return 5000;
+					break;
+				case 'edition':
+					return undefined;
+					break;
+				case 'authors':
+					return value.join(',');
+					break;
+				default:
+					return "晃晃";
+			}
+		});
+		console.log(a2);
+
+		var a3 = JSON.stringify(book,null,2);
+		console.log(a3);
+
+		var book2 = {
+			title: 'Proshjsk',
+			"authors": [
+				"Noshjskf","afdhsaf"
+			],
+			edition: 3,
+			year: 2011,
+			releaseDate: new Date(2011,11,1)
+		}
+
+		var jsonText2 = JSON.stringify(book2);
+		//JSON.parse()方法也可以接受第二个参数 该函数区别stringify的过滤函数 为还原函数
+		var bookCopy = JSON.parse(jsonText2,function(key,value) {
+			if(key == "releaseDate") {
+				return new Date(value);
+			} else {
+				return value;
+			}
+		})
+		console.log(bookCopy);
+
+		console.log(bookCopy.releaseDate.getFullYear());
+
+
+		//json的序列化
+
+		// stringfify(对象,(数组/函数))
+		/*序列化的步骤：
+		1.如果有toJSON()方法则使用该方法进行序列化,没有方法则使用默认的方法进行序列化
+		2.如果有第二个参数则根据第二个参数进行过滤,传入的值是第一步序列化以后的值
+		3.如果有第三个参数则根据参数执行缩进*/
+
+		var result1 = JSON.stringify(book2, ["title","authors"]);
+		var result2 = JSON.stringify(book2, function(key,value) {
+			switch (key) {
+				case "title":
+					return "huanglijuan"
+					// break;此处没有break语句 会继续执行其他条件
+				case "authors":
+					return value.join(' @ ')
+					// break;
+				case "edition":
+					return 100
+					// break;
+				case "year":
+					return undefined //undefined会删除该键值
+					// break;
+				default: //给一个默认的选项 以便不参与过滤的选项可以返回其本身的结果
+					return value 
+					// break;
+			}
+		},'#');//第三个参数表示缩进 可以填入数值表示缩进的空格
+		console.log(result1);
+		console.log(result2);
+			
+	</script>
+</body>
+</html>

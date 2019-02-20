@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script type="text/javascript" src="js/eventUti.js"></script>
+</head>
+<style type="text/css">
+	#div1 {
+		position: absolute;
+		left: 100px;
+		top: 100px;
+		width: 200px;
+		height: 200px;
+		background-color: red;
+	}
+	#status {
+		position: absolute;
+		left: 400px;
+		top: 400px;
+		width: 200px;
+		height: 200px;
+		background-color: #784658;
+	}
+</style>
+<body>
+	<div id="div1" class="draggable"></div>
+	<div id="status" class="draggable"></div>
+	<button id="btn">按钮</button>
+	<p id="p1">这是一个段落</p>
+	<ul id="ul">
+		<li>测试1</li>
+		<li>测试2</li>
+		<li>测试3</li>
+	</ul>
+	<script type="text/javascript">
+		//1.安全的类型检测
+		var arr = ["2","9","289","29"];
+		function isArray(value) {
+			return Object.prototype.toString.call(value);
+		}
+		console.log(isArray(arr));
+
+
+		//作用域安全的构造函数
+
+		//构造函数
+		function Person(name,age) {
+			this.name = name;
+			this.age = age;
+		}
+		var person1 = new Person("xxx",18);
+		console.log(person1.name);//  "xxx"
+		console.log(person1.age);//    18
+
+		console.log(window.name)
+		console.log(window.age)// "undefined"
+
+		//以上是在构造函数的作用域中调用该函数
+
+		//但是如果我们直接调用孩函数的话
+		Person("huanghuang",19);
+		console.log(window.name);//"huanghuang"
+		console.log(window.age); // 19
+
+		//此时我们发现在不通过new操作符调用函数的情况下 函数内部的this作用域默认变成了window 因此导致作用域发生改变 默认情况下 window对象的name属性指向的应该是该文档内的不同的框架的名字 这样会导致出错 解决办法如下 对构造函数本身进行检测 判断测试的this指向必须是实例化后的对象 再绑定属性值
+
+		function Person2(name,age) {
+			if(this instanceof Person2) {
+				this.name = name;
+				this.age = age;
+			} else {
+				return new Person2(name,age);
+			}
+		}
+ 		
+ 		var person2 = new Person2("haha",20);
+ 		console.log(person2.name) // "haha"
+ 		console.log(person2.age) // 19
+
+ 		Person2("heihei",21);
+ 		console.log(window.name); // "huanghuang" // 此时问题得到解决 
+ 		console.log(window.age); // 19;
+
+
+ 		function Person3(name,age) {
+ 			this.name = name;
+ 			this.age = age;
+ 			console.log(this instanceof Person3);
+ 		}
+
+ 		var person3_window = Person3("ss",12); // false
+ 		var person3_Object = new Person3("eee",14); // true
+
+ 		var a = (function() {
+ 			var getName = function() {
+ 				console.log('huanghuang');
+ 			}
+ 			return { //此处一定要return
+ 				getName: getName
+ 			}
+ 		})(); 
+ 		a.getName();
+
+ 		(function(exports) {
+ 			var _ = {
+ 				getQueryString: function(name) {
+ 					console.log('sss');
+ 				}
+ 			}
+ 			exports._ = _;
+ 		})(window);
+
+ 		_.getQueryString();
+
+
+ 		function Polygon(sides) {
+ 			if(this instanceof Polygon) {
+ 				this.sides = sides;
+ 				this.getArea = function() {
+ 					return 0
+ 				}
+ 			} else {
+ 				return new Polygon(sides);
+ 			}
+ 		}
+
+ 		function Rectangle(width,height) {
+ 			 //此处主要是用于继承 此处可以看作先执行Polygon函数 并且把Polygon()的执行环境换成this 
+ 			 //而this此刻是rectangle的中环境 因此if(this instanceof Polygon) 不成立 
+ 			 //所以就执行了else中的语句 导致并没有继承到sides的值
+ 			Polygon.call(this,2);
+ 			this.width = width; 
+ 			this.height = height;
+ 			this.getArea = function() {
+ 				return this.width * this.height;
+ 			}
+ 		}
+
+ 		Rectangle.prototype = new Polygon();
+ 		var rect = new Rectangle(5,10);
+ 		console.log(rect.sides); //
+
+
+ 		function Class1() {
+ 		    this.name = "class1";
+ 		    this.showNam = function() {
+ 		        console.log(this.name);
+ 		    }
+ 		}
+ 		function Class2() {
+ 		    this.name = "class2";
+ 		}
+ 		var c1 = new Class1();
+ 		var c2 = new Class2();
+ 		c1.showNam.call(c2); //console.log("class2"); 
+
+
+
+ 		//惰性载入函数
+
+ 		//每次执行的时候都会先执行很多的判断 
+ 		function createXHR() {
+ 			if(typeof XMLHttpRequest != "undefined") {
+ 				var xhr = new XMLHttpRequest();
+ 			} else if (typeof ActiveXObject != "undefined") {
+ 				if (typeof arguments.callee.activeXString != "string") {
+ 					var versions = ["MSXML2.XMLHttp.6.0","MSXML2.XMLHttp.3.0","MSXML2.XMLHttp"];
+ 					for(var i = 0; i < versions.length;i++) {
+ 						try {
+ 							new ActiveXObject(versions[i]);
+ 							arguments.callee.activeXString = versions[i];
+ 							break;
+ 						} catch (ex) {
+ 							//跳过
+ 						}
+ 					}
+ 				}
+ 				return new ActiveXObject(arguments.callee.activeXString);
+ 			} else {
+ 				throw new Error("no XHR object available");
+ 			}
+ 		}
+
+ 		//第一种方式是 在函数调用的时候对函数进行处理 这样第一次在函数调用时 会覆盖之前的函数 所有函数的执行将不再经过分支  最终是返回这个函数 则在第二次调用的时候将不再做判断
+ 		function createXHR() {
+ 			if(typeof XMLHttpRequest != "undefined") {
+ 				createXHR = function() {
+ 					var xhr = new XMLHttpRequest();
+ 				}
+ 			} else if (typeof ActiveXObject != "undefined") {
+ 				createXHR = function() {
+ 					if (typeof arguments.callee.activeXString != "string") {
+ 						var versions = ["MSXML2.XMLHttp.6.0","MSXML2.XMLHttp.3.0","MSXML2.XMLHttp"];
+ 						for(var i = 0; i < versions.length;i++) {
+ 							try {
+ 								new ActiveXObject(versions[i]);
+ 								arguments.callee.activeXString = versions[i];
+ 								break;
+ 							} catch (ex) {
+ 								//跳过
+ 							}
+ 						}
+ 					}
+ 					return new ActiveXObject(arguments.callee.activeXString);
+ 				}
+ 			} else {
+ 				throw new Error("no XHR object available");
+ 			}
+ 			return createXHR();
+ 		}
+
+ 		//第二种情况 是在函数声明的时候就指定适当的方法 这样在加载的时候并不损失性能 但是在初次加载的时候会损失性能
+ 		var createXHR = (function() {
+ 			if(typeof XMLHttpRequest != "undefined") {
+ 				return function() {
+ 					return new XMLHttpRequest();
+ 				};
+ 			} else if (typeof ActiveXObject != "undefined") {
+ 				return function()  {
+					if (typeof arguments.callee.activeXString != "string") {
+						var versions = ["MSXML2.XMLHttp.6.0","MSXML2.XMLHttp.3.0","MSXML2.XMLHttp"];
+						for(var i = 0; i < versions.length;i++) {
+							try {
+								new ActiveXObject(versions[i]);
+								arguments.callee.activeXString = versions[i];
+								break;
+							} catch (ex) {
+								//跳过
+							}
+						}
+					}
+					return new ActiveXObject(arguments.callee.activeXString);
+				} 
+			} else {
+				throw new Error("no XHR object available");
+			}
+ 		})();
+ 		
+ 		var ar = (function() {
+ 			return 12;
+ 		})();
+
+ 		console.log(ar) //12
+
+
+ 		//函数绑定
+ 		var handler = {
+ 			message: "Event handled",
+ 			handleClick: function(event) {
+ 				console.log(this.message)
+ 			}
+ 		}
+
+ 		var btn = document.getElementById("btn");
+
+ 		eventUti.addHandler(btn,'click',handler.handleClick); // undefined没有保存handler.handleClick()的执行环境
+
+ 		eventUti.addHandler(btn,'click',function() {
+ 			handler.handleClick();
+ 		});
+
+
+ 		//将函数绑定到指定环境的函数 bind()
+
+ 		function bind(fn,context) {
+ 			return function() {
+ 				return fn.apply(context,arguments);
+ 			}
+ 		}
+
+
+ 		//函数柯里化
+ 		// 用一个闭包返回一个函数 返回的函数还需要设置一些传入的参数
+ 		function add(num1,num2) {
+ 			return num1 + num2;
+ 		}
+
+ 		function curriedAdd(num2) {
+ 			return add(5,num2);
+ 		}
+
+ 		console.log(curriedAdd(3)) // 8
+
+ 		function curry(fn) {
+ 			var args = Array.prototype.slice.call(arguments,1);
+ 			return function() {
+ 				var innerArgs = Array.prototype.slice.call(arguments);
+ 				var finalArgs = args.concat(innerArgs);
+ 				return fn.apply(null,finalArgs);
+ 			}
+ 		}
+
+
+ 		//高级定时器
+ 		// javascript是运行于单线程的环境中的 定时器的时间间隔只是表示在何时将代码添加到队列中去 并不是何时执行代码 
+
+
+ 		//自定义事件
+ 		function EventTarget() {
+ 			//一个单独的属性handlers 用于存储事件处理程序
+ 			this.handlers = {};
+ 		}
+
+ 		//所有的函数都有prototype属性 这个属性是一个指针 指向的是一个对象 该对象包含着特定类型所共有的属性和方法
+
+ 		EventTarget.prototype = {
+ 			//每个原型对象上都有一个constructor属性 指向构造函数？？？
+ 			constructor: EventTarget,
+ 			addHandler: function(type,handler) {//用于给的类型事件的事件处理程序
+ 				if(typeof this.handlers[type] == "undefined") {
+ 					this.handlers[type] = [];
+ 				}
+ 				this.handlers[type].push(handler);
+ 			},
+ 			fire: function(event) {//用于触发一个事件
+ 				if(!event.target) {
+ 					event.target = this;
+ 				}
+ 				if(this.handlers[event.type] instanceof Array) {
+ 					var handlers = this.handlers[event.type];
+ 					for(var i = 0; i < handlers.length;i++) {
+ 						handlers[i](event);
+ 					}
+ 				}
+ 			},
+ 			removeHandler: function(type,handler) {//用于注销某个类型的事件处理程序
+ 				if(this.handlers[type] instanceof Array) {
+ 					var handlers = this.handlers[type];
+ 					for(var i = 0; i < handlers.length;i++) {
+ 						if(handlers[i] == handler) {
+ 							break;
+ 						}
+ 					}
+ 					handlers.splice(i,1)//向数组中添加或删除指定个数的元素 并返回被删除的元素 如果有添加的元素 则会用添加的元素替换删除的元素
+ 				}
+ 			}
+ 		}
+
+ 		//使用方式
+ 		function handleMessage(event) {
+ 			console.log("message received:" + event.message);
+ 		}
+
+ 		//创建一个新对象
+ 		var target  = new EventTarget();
+
+ 		//添加一个事件处理程序
+ 		target.addHandler("message",handleMessage);
+
+ 		//触发事件
+ 		target.fire({type:"message",message:"hello world!"});
+
+ 		//删除事件处理程序
+ 		target.removeHandler("message",handleMessage);
+
+ 		//再次 应没有事件处理程序
+ 		// target.fire({type:"message",message:"hello world!"});
+
+
+ 		//函数节流  连续进行高频率的触发 可能会导致浏览器崩溃 函数节流背后的思想是 某些代码不可能在没有间断的情况下重复执行 虽然只是将代码延迟几十毫秒执行 但是对浏览器来说可以节省很多的计算
+
+ 		var processor = {
+ 			//timeId值必须先设置为null 这样在初次执行process的时候 才不会出现错误
+ 			timeId: null,
+ 			performProcessing: function() {
+ 				//...实际执行
+ 				console.log("哈哈")
+ 			},
+ 			process: function() {
+ 				//从第二次执行开始 如果前一次执行还未发生 那么就重新定义一个定时器替换之前的 如果已经执行过了 那么这个操作就没有意义
+ 				clearTimeout(this.timeId);
+ 				var _this = this;
+ 				this.timeId = setTimeout(function() {
+ 					_this.performProcessing();
+ 				},50);
+ 			}
+ 		}
+ 		processor.process();
+
+
+ 		function throttle(method,context) {
+ 			//此处timeId不会报错吗？
+ 			clearTimeout(method.timeId);
+ 			//如果函数是初次执行 那么会自动创建timeId属性
+ 			method.timeId = setTimeout(function() {
+ 				//定时器使用call方法来确定函数在适当的作用域中执行 如果没有传入参数 那么就在全局的作用域下执行
+ 				method.call(context);
+ 			},100)
+ 		}
+
+
+
+ 		//拖放
+ 		// var div1 = document.getElementById("div1");
+ 		// div1.onmousedown = function(e) {
+ 		// 	var disX = e.pageX - div1.offsetLeft;
+ 		// 	var disY = e.pageY - div1.offsetTop;
+ 		// 	document.onmousemove = function(e) {
+ 		// 		div1.style.left = e.pageX - disX + "px";
+ 		// 		div1.style.top = e.pageY - disY + "px";
+ 		// 	}
+ 		// 	document.onmouseup = function(e) {
+ 		// 		document.onmousemove = null;
+ 		// 	}
+ 		// }
+
+ 		//例子
+ 		var DragDrop = function() {
+ 			var dragdrop = new EventTarget();
+ 				dragging = null;
+ 				disX = 0;
+ 				disY = 0;
+ 			function handleEvent(event) {
+ 				//获取事件和目标
+ 				event = eventUti.getEvent(event);
+ 				var target = eventUti.getTarget(event);//target获取的是触发事件的元素 而currentTargrt返回的是绑定事件的元素
+ 				//确定事件类型
+ 				switch(event.type) {
+ 					case "mousedown":
+ 						if(target.className.indexOf("draggable") > -1) {
+ 							dragging = target;
+ 							disX = event.pageX - target.offsetLeft;
+ 							disY = event.pageY - target.offsetTop;
+ 							dragdrop.fire({
+ 								type: "dragstart",
+ 								target: dragging,
+ 								x: event.clientX,
+ 								y: event.clientY
+ 							})
+ 						}
+ 						break;
+ 					case "mousemove":
+ 						if(dragging !== null) {
+							dragging.style.left = event.pageX - disX + "px";
+							dragging.style.top = event.pageY - disY + "px";
+							dragdrop.fire({
+								type: "dragstart",
+								target: dragging,
+								x: event.clientX,
+								y: event.clientY
+							})
+ 						}
+ 						break;
+ 					case "mouseup":
+ 					dragdrop.fire({
+ 						type: "drag",
+ 						target: dragging,
+ 						x: event.clientX,
+ 						y: event.clientY
+ 					})
+ 						dragging = null;
+ 						break;
+ 				};
+ 			}
+ 			dragdrop.enable = function() {
+ 				eventUti.addHandler(document,"mousedown",handleEvent);
+ 				eventUti.addHandler(document,"mousemove",handleEvent);
+ 				eventUti.addHandler(document,"mouseup",handleEvent);
+ 			};
+ 			dragdrop.disable = function() {
+ 				eventUti.removeHandler(document,"mousedown",handleEvent);
+ 				eventUti.removeHandler(document,"mousemove",handleEvent);
+ 				eventUti.removeHandler(document,"mouseup",handleEvent);
+ 			}
+ 			return dragdrop;
+ 		}();
+
+ 		DragDrop.enable();
+
+ 		DragDrop.addHandler("dragstart",function(event) {
+ 			var status = document.getElementById("status");
+ 			status.innerHTML = "Started dragging" + event.target.id;
+ 		})
+
+ 		DragDrop.addHandler("drag",function(event) {
+ 			var status = document.getElementById("status");
+ 			status.innerHTML += "<br/> Dragged" + event.target.id + " to (" + event.x + "," + event.y + ")";
+ 		})
+
+ 		DragDrop.addHandler("dragend",function(event) {
+ 			var status = document.getElementById("status");
+ 			status.innerHTML += "<br/> Dropped" + event.target.id + " at (" + event.x + "," + event.y + ")";
+ 		})
+
+
+
+ 		
+	</script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>千峰--跨域(百度搜索框)</title>
+</head>
+<style type="text/css">
+	#q {width: 300px;height: 30px;padding: 5px;border: 1px solid #f09;font-size: 16px;}
+	#ul1 {border: 1px solid #f90;width: 310px;margin: 0;padding: 0;display: none;}
+	#ul1 li {list-style: none;}
+	#ul1 li a {line-height: 30px;padding: 5px;text-decoration: none;display: block;color: #000;}
+	#ul1 li a:hover {background: #f90;color: #fff;}
+</style>
+<body>
+	<input type="text" name="" id="q">
+	<ul id="ul1"></ul>
+	<script type="text/javascript">
+		/*跨主机请求数据的情况
+		同源/同域请求
+		ajax规定不能跨域请求 也就是说请求的数据必须在同一台服务器下
+		http://api.douban.com/book/subjects?q=javascript&alt=json&mac-results=1*/
+
+		/*JSONP跨域
+		1.通过srcipt标签的src属性实现跨域
+		2.我们需要在想加载数据的时候 再将数据加载出来 可以动态创建script标签
+		步骤：
+		1.在资源加载进来之前定义好一个函数 这个函数接受一个参数（下载数据）
+		2.函数里面利用这个参数做一些事情
+		3.在需要的时候 通过script加载对应远程文件
+		4.当远程文件资源加载进来的时候 就会执行定义好的函数 并且把数据当做这个函数的参数传入进去
+		*/
+		function show(data) {
+			var list = data.s;
+			var oul = document.getElementById('ul1');
+			if(list.length) {
+				oul.style.display = 'block';
+				for(var i = 0;i < list.length;i++) {
+					var oli = document.createElement('li');
+					var oa = document.createElement('a');
+					oa.innerHTML = list[i];
+					oa.href = 'http://www.baidu.com/s?wd=' + list[i];
+					oli.appendChild(oa);
+					oul.appendChild(oli);
+				}
+			}
+			
+		}
+		window.onload = function() {
+			var oq = document.getElementById('q');
+			var oul = document.getElementById('ul1');
+			oq.onkeyup = function() {
+				if(this.value != '') {
+					// 通过JSONP下载数据
+					var oscript = document.createElement('script');
+					oscript.src = 'http://suggestion.baidu.com/su?wd='+ this.value +'&cb=show';
+					document.body.appendChild(oscript);
+				} else {
+					oul.style.display = 'none';
+				}
+			}	
+		}
+
+	</script>
+</body>
+</html>

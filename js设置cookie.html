@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<script type="text/javascript">
+		//设置cookie
+		function setCookie(key,value,times) {
+			var date = new Date();
+			date.setDate(date.getDate() + times);
+			document.cookie = key + '=' + value + '; ' + times + '=' + date;
+		}
+		//获取cookie
+		function getCookie(key) {
+			var cookies = document.cookie.split('; ');
+			for(var i = 0;i < cookies.length;i++) {
+				var itemCookies = cookies[i].split('=');
+				if(itemCookies[0] == key) {
+					return itemCookies[1]
+				}
+			}
+		}
+		//删除cookie
+		function delCookie(key) {
+			setCookie(key,'',-1);   
+		}
+		//检测cookie
+		function checkCookie() {
+			var user = getCookie("username");
+			if(user != '') {
+				alert('welcoom again' + user);
+			} else {
+				user = prompt("please write your name" , "");
+				if(user != "" && user != null) {
+					setCookie("username",user,365);
+				}
+			}
+		}
+	</script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>javascript高级程序设计第三章《基本概念》</title>
+</head>
+<body>
+<script type="text/javascript">
+	// 六种基本的数据类型: Null、Undefined、String、Object、Number、Boolean
+	var message = "hello world!"; // string
+	var msg; // undefined
+	var a = ""; // string
+	var b = 8; // number
+	var c = {}; // object
+	var d = true; // boolean
+	console.log(typeof(message));
+	console.log(typeof(msg));
+	console.log(typeof(a));
+	console.log(typeof(b));
+	console.log(typeof(c));
+	console.log(typeof(d));
+	console.log(typeof(null)); // object null表示对一个空对象的引用
+
+
+	var e;
+	var f = undefined;
+	console.log(e); // undefined
+	console.log(f); // undefined ?
+
+	// 如果定义的变量准备在将来保存一个对象,那么最好将变量初始化为null而不是其他值
+	var car = null; 
+	console.log(typeof car); // object
+
+
+	console.log(undefined == null) //true
+
+
+	var found = false;
+	var lost = true;
+	console.log(typeof found); // boolean
+
+
+	var g = "hah";
+	var h = Boolean(g);
+	console.log(h); // true
+
+
+	var I = "hello world";
+	if(I) {
+		console.log(I);
+	}
+
+
+	var J = 3.125e7;
+	console.log(J); // 31250000
+
+
+	console.log(0.1 + 0.2); // 0.30000000000000004
+
+
+	// NaN 本来要返回一个数值但是没有返回数值的情况
+	console.log(NaN == NaN); // false
+	console.log(isNaN(0)); // false
+	console.log(isNaN(true)); // false
+	console.log(isNaN(NaN)); // true
+	console.log(isNaN("true")); // true
+
+
+	// 有三个函数可以把非数值转化为数值 Number()、parseInt()、parseFloat()
+	/*
+		Number 可以将任何非数值转化为数值
+		parseInt()、parseFloat() 可以将字符串转化为数值
+	*/
+	console.log(parseInt("22.34.35")); // 22
+	console.log(parseFloat("22.34.35")); // 22.34
+</script>
+</body>
+</html>

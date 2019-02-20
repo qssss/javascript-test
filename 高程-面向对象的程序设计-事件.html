@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>事件</title>
+</head>
+<style type="text/css">
+	#div1 {width: 300px;height: 300px;background-color: #547866;}
+	#div2 {width: 150px;height: 150px;background-color: #876567;}
+	#div3 {width: 80px;height: 80px;background-color: #276478;}
+</style>
+<body>
+	<button id="btn1">btn1</button>
+	<button id="btn2">btn2</button>
+	<div id="div1">
+		这是div1
+		<div id="div2">
+			这是div2
+			<div id="div3">
+				这是div3
+			</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+
+		// var btn1 = document.getElementById('btn1');
+		// //dom0级
+		// btn1.onclick = function() {
+		// 	console.log('btn1');
+		// }
+		// btn1.onclick = null; //删除事件处理程序
+
+		// //dom2级
+		// var btn2 = document.getElementById('btn2');
+		// btn2.addEventListener('click',btn2Click,false);
+
+		// function btn2Click() {
+		// 	console.log('您点击了btn2');
+		// 	console.log(this.id);
+		// 	console.log(this == window) //false
+		// }
+		// btn2.removeEventListener('click',btn2Click);
+
+		var eventUti = {
+			addHandler: function(elem,type,hander) {
+				if (elem.addEventListener) {
+					elem.addEventListener(type,hander,false);
+				} else if(elem.attachEvent) {
+					elem.attachEvent('on' + type,hander,false);
+				} else {
+					elem[on + type] = hander;
+				}
+			},
+			removeHander: function(elem,type,hander) {
+				if(elem.removeEventListener) {
+					elem.removeEventListener(type,hander,false);
+				} else if(elem.detachEvent) {
+					elem.detachEvent('on' + type,hander,false);
+				} else {
+					elem[on + type] = null;
+				}
+			},
+			getEvent: function(event) {
+				return event ? event : window.event;
+			},
+			getTarget: function(event) {
+				return event.target ? event.target : event.srcElement;
+			},
+			perventDefault: function(event) {
+				if(event.perventDefault) {
+					event.perventDefault();
+				} else {
+					window.event.returnValue = false;
+				}
+			},
+			stopPropagation: function(event) {
+				if(event.stopPropagation) {
+					event.stopPropagation();
+				} else {
+					event.cancelBubble = true;
+				}
+			}
+		}
+
+		function mousehaner() {
+			console.log('hello');
+		}
+
+		eventUti.addHandler(btn1,'mouseover',mousehaner);
+
+	
+		var div1 = document.getElementById('div1');
+		var div2 = document.getElementById('div2');
+		var div3 = document.getElementById('div3');
+		var handerDiv1 = function(e) {
+			// alert('您点击了div1');
+			// alert('事件的类型:' + e.type);
+			// alert('事件是否冒泡:' + e.bubbles);
+			// alert('e的currentTarget是:' + e.currentTarget);
+			// alert('e的target是:' + e.target);
+			// alert('this的值是:' + this);
+			// alert('是否有开发人员添加的:' + e.trusted);
+		}
+		var handerDiv2 = function(e) {
+			alert('您点击了div2');
+		}
+		var handerDiv3 = function(e) {
+			alert('您点击了div3');
+		}
+		//在事件处理程序中 事件的this始终等于currentTarget 指向的是绑定事件的目标 但是事件的target却指向的是触发事件的目标(真正的目标)
+		var handerBody = function(e) {
+			alert('您点击了body');
+			alert('e.target是:' + e.target); //html
+			alert('e.currentTarget是:' + e.currentTarget); //body
+			alert('this的值是' + this)
+		}
+		eventUti.addHandler(div1,'click',handerDiv1);
+		eventUti.addHandler(div2,'click',handerDiv2);
+		eventUti.addHandler(div3,'click',handerDiv3);
+		eventUti.addHandler(document.body,'click',handerBody);
+
+
+		//当需要元素处理多个事件时
+		var handerMouse = function(e) {
+			switch(e.type) {
+				case 'mouseover':
+					alert('触发mouseover事件');
+					break;
+				case 'mouseout':
+					alert('触发mouseout事件');
+					break;
+			}
+		}
+		btn1.onmouseover = handerMouse;
+		btn1.onmouseout = handerMouse;
+	</script>
+</body>
+</html>

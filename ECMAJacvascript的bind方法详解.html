@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>ECMAScript的bind方法详解</title>
+	<script type="text/javascript" src="js/globalVariable.js"></script>
+</head>
+<style type="text/css">
+	.box {
+		background: pink;
+	}
+</style>
+<body>
+<script type="text/javascript">
+	//通过对Function的原型进行拓展，可以为ie6-8的浏览器自定义bind方法
+	function funcBindHandle() {
+		if(!function(){}.bind) {
+			Function.prototype.bind = function(context) {
+				var self = this;
+				var args = Array.prototype.slice.call(arguments);
+				return function() {
+					return self.apply(context,args.slice(1))
+				}
+			}
+		}
+	}
+	window.onload = function() {
+		funcBindHandle();
+		/*一创建绑定函数*/
+		this.x = 9;
+		console.log(this) // => window
+
+		var module = {
+			x: 81,
+			obj: function() {
+				console.log(this.x);
+			}
+		}
+		var b = {
+			x: 79
+		}
+
+		var getObj = module.obj;
+		getObj(); // => 9
+
+		var getCallObj = module.obj.call(b); // => 79
+
+		var getBindObj = module.obj.bind(b);
+		getBindObj(); // => 79
+
+		
+		
+
+		/*二*/ 
+		//将类数组对象转换为数组
+		function list() {
+			return Array.prototype.slice.call(arguments);
+		}
+		var list1 = list(1,2,3);
+		console.log(list1)// [1,2,3]
+		
+
+		var leadingThritysevenList = list.bind(this,37);
+		var list2 = leadingThritysevenList();
+		console.log(list2) // [37]
+
+		var list3 = leadingThritysevenList(1,2,3);
+		console.log(list3) // [37,1,2,3]
+
+
+		/*三*/
+		function LateBloomer() {
+			this.petalCount = Math.ceil(Math.random() * 12) + 1;
+		}
+
+		LateBloomer.prototype.bloom = function() {
+			//setTimeout默认是指向的是window对象，当使用类的方法的时候,需要调用this引用类的实例的时候,可以用bind方法将this重新绑定到类的实例
+			window.setTimeout(this.declare.bind(this),1000);
+		}
+
+		LateBloomer.prototype.declare = function() {
+			console.log("I am a beautiful flower with " + this.petalCount + " petals");
+		}
+
+		var flower = new LateBloomer();
+		flower.bloom();
+
+		/*三*/
+		function add(c,d) {
+			return this.a + this.b + c + d;
+		}
+
+		var s = {
+			a: 1,
+			b: 2
+		}
+
+		console.log(add.call(s,3,4)) // 1+2+3+4 = 10;
+		console.log(add.apply(s,[3,4])) //1+2+3+4 = 10; 
+
+		/*三*/
+		var pet = {
+			word: "miaomiao",
+			speak: function(say) {
+				console.log(say + ":" + this.word);
+			}
+		}
+
+		var dog = {
+			word: "wangwang"
+		}
+
+		pet.speak.call(dog,"speak");
+
+		/*四 => 使用call来实现继承？*/
+		var t = {
+			sayWangWang() {
+				console.log("wangwang");
+			},
+			sayMiaoMiao() {
+				console.log("miaomiao");
+			}
+		}
+
+		function myFunc() {
+			function sayMiaoMiao() {
+				console("就不" + "say" + "喵喵")
+			}
+			var m = t.sayMiaoMiao.call(this);
+			console.log(m)//undefined
+		}
+
+		myFunc();//miaomiao
+
+		/*使用call方法调用父构造函数*/
+		function Product(name,price) {
+			this.name = name;
+			this.price = price;
+			if(price < 0) {
+				throw RangerError('cannot create product' + this.name + 'with a negative price');
+			}
+		}
+
+		function Food(name,price) {
+			Product.call(this,name,price);
+			this.category = 'foot';
+		}
+
+		function Toy(name,price) {
+			Product.call(this,name,price);
+			this.category = 'toy';
+		}
+
+		var t = new Food('feta',5);
+		var p = new Toy('robot',40);
+		console.log(t);//Foot {name:"feta",price: 5,catagory: "foot"}
+		console.log(p);//Toy {name:"robot",price: 5,catagory: "toy"}
+
+		/*使用call方法调用匿名函数*/
+		var animals = [
+			{specials: 'Lion',name: 'King'},
+			{specials: 'Whale',name: 'Fail'}
+		]
+
+		for(var i = 0;i < animals.length;i++) {
+			(function(i) {
+				this.print = function() {
+					console.log('#' + i + this.specials + ":" + this.name)
+					/*
+						#0Lion:King
+						#1Whale:Fail
+					*/
+				}
+				this.print();
+			}).call(animals[i],i);
+		}
+
+		/*使用call方法调用函数并且指定上下文的this*/
+		function greet() {
+			var reply = [this.person,'Is An Awesome',this.role].join('.')
+			console.log(reply);//Douglas Crockford.Is An Awesome.Javascript Developer
+			console.log(typeof reply)//string
+		}
+		var i = {
+			person: 'Douglas Crockford',
+			role: 'Javascript Developer'
+		}
+		greet.apply(i);
+
+		/*关于闭包*/
+		function A() {
+			function B() {
+				console.log("我是在函数B中打印的");
+			}
+			return B;
+		}
+
+		var C = A();
+
+		C();
+
+		/*
+			在javascript中,如果一个对象不再被引用,那么它就会被GC回收,否则它就会一直被保存在内存中。
+			当我们需要在模块中定义一些变量,我们希望这些变量一直保存在内存中但是又不希望污染全局变量时就可以用闭包。
+		*/
+		function D() {
+			var count = 0;
+			function E() {
+				count++;
+				console.log(count);
+			}
+			return E;
+		}
+		var F = D();
+		F(); //1
+		F(); //2
+		F(); //3
+
+		/*闭包的高级写法*/
+		(function(document) {
+			var viewport;
+			var obj = {
+				init: function(id) {
+					viewport = document.querySelector("#" + id);
+				},
+				addChild: function(child) {
+					viewport.appendChild(child);
+				},
+				removeChild: function(child) {
+					viewport.removeChild(child);
+				}
+			}
+			window.Viewport = obj;
+		})(document);
+
+
+		var x = 40;
+		function bounceImage() {
+			var x = 20;
+			console.log(x)
+		}
+		setTimeout(bounceImage.bind(this),3000);
+
+		function show(sex) {
+			console.log(this.name + " " + sex)
+		}
+		var person = {
+			name: "aaa",
+			age: 18
+		}
+		show.call(person,"男");
+
+		/*创建函数的两种方法,函数声明和函数表达式*/
+
+		//函数声明
+		var a1 = 10,
+			a2 = 9;
+		function sub(a1,a2) {
+			console.log(a1 - a2);
+		}
+		sub(90,65) //25
+		sub.call(null,20,15); //5 ???
+		
+		//匿名函数表达式
+		var sub = function(a1,a2) {
+			console.log(a1 - a2);
+		}
+		sub() //NaN
+		sub(9,6) // 3
+
+		//命名函数表达式
+		var sub = function f(a1,a2) {
+			console.log(a1 - a2);
+			/*
+				Maximum call stack size exceeded 栈溢出
+				f(20,6)
+			*/
+		}
+		sub(20,9) // 11
+		/*
+		f(a1 - a2)
+		f is not defined 这个函数名称f实际上变成了函数内部的一个局部变量,并且指代函数本身 */
+
+
+		/*函数的递归调用*/
+		function factorial(num) {
+			if(num < 1) {
+				return 1;
+			}
+			else {
+				return num * factorial(num - 1);
+			}
+		}
+		/*
+			以上导致函数名称和执行代码紧密耦合在一起会导致如以下代码的无法执行
+			var anotherFac = factorial;
+			factorial = null; 变量factorial对函数的引用已经解除
+			anotherFac(5);factorial is not a function
+		*/
+		
+		
+		function factorial(num) {
+			if(num < 1) {
+				return 1;
+			}
+			else {
+				return num * arguments.callee(num - 1);
+			}
+		}
+		/*
+			arguments.callee是始终指向正在执行的函数的指针
+			以上代码在严格模式下无法执行,脚本无法识别arguments.callee
+		*/
+
+		var factorial = function f(num) {
+			if(num < 1) {
+				return 1;
+			}
+			else {
+				return num * f(num - 1);
+			}
+		}
+
+		/*
+			以上函数名称f和执行代码已经解除耦合,函数名称变成了函数内部的一个局部变量,因此即使是出现如上述null的情况,也不会出错
+		*/
+		console.log(factorial(5));
+
+		/*代码的模块化*/
+		var person  = (function() {
+			var _name = "";
+			return {
+				getName: function() {
+					return _name;
+				},
+				setName: function(newname) {
+					_name = newname;
+				}
+			}
+		})()
+
+		person.setName("黄丽娟");
+		console.log(person.getName());
+
+		(function() {
+			var _name = "";
+			var root = this;
+			console.log("当前的this值是" + root) //[object Window]
+			var person = {
+				getName: function() {
+					return _name;
+				},
+				setName: function(newname) {
+					_name = newname;
+				}
+			};
+			root.person = person;
+		}.call(this))
+
+		/*关于js代码模块化: 可复用性/可维护性/避免命名空间污染*/ 
+
+		//原始写法 => 污染了全局变量，无法保证不与其他模块发生变量名冲突，且看不出彼此之间的关系
+		function m1() {
+			console.log("我是m1")
+		}
+		function m2() {
+			console.log("我是m2")
+		}
+
+		//对象写法  => 暴露了模块成员，内部状态可以被外部改写
+		var obj1 = new Object({
+			count: 1,
+			m1: function() {
+				console.log("我是m1");
+				console.log(this)//当一个函数被一个对象包含的时,我们说它的this被隐式的绑定到了对象上面
+			},
+			m2: function() {
+				console.log("我是m2");
+			}
+		})
+		obj1.count = 8;
+		console.log(obj1.count);//8
+		obj1.m1();
+
+		//立即执行函数IIFE(只针对函数表达式) => 可以达到不暴露私有成员的目的
+		var obj2 = (function() {
+			var count1 = 23;
+			var m1 = function() {
+				console.log("我是m1");
+			};
+			var m2 = function() {
+				console.log("我是m2");
+			}
+			return {
+				m1: m1,
+				m2: m2
+			}
+		})();
+		console.log(obj2.count1); //undefined
+		console.log(obj2.m1); //function m1() {console.log("我是m1")}
+		console.log(obj2.m2); //function m2() {console.log("我是m2")}
+
+		//用括号把匿名函数包起来,以function关键字开头的函数会被解释成函数声明(javascript中不允许没有函数名称的函数声明),因此用括号包起来会被自动解释为函数表达式)
+		(function() {
+			console.log("我的括号在外面哦");
+		})();
+
+		(function() {
+			console.log("我的括号在里面哦");
+		}());
+
+		//放大模式 => 如果一个模块很大,必须放分成几个部分,或者一个模块需要继承另一个模块,这时就有必要使用放大模式
+		var module1 = (function(mod) {
+			mod.m3 = function() {
+				console.log("我是放大模式")
+			}
+			return mod;
+		})(module1);
+
+		//宽放大模式 => 在加载模块的时候,无法知道模块加载的顺序,第一个执行的部分可能会加载一个不存在的空对象,这个时候就要使用宽放大模式 => 立即执行函数的参数可以是空对象
+		var module2 = (function(mod) {
+			return mod;
+		})(window.module2 || {})
+
+
+		//输入全局变量 => 模块的重要特点是保持独立性,模块内部最好不要与程序其它部分直接进行交互,为了在模块内部使用全局变量,需要显示的将全局变量输入到模块中
+		var module3 = (function($,YHOOD) {
+
+		})(jQuery,YHOOD);
+
+
+		var f = (function(a) {
+		  console.log(a);  //使用()运算符，打印出123
+		})(123);
+	
+		/*模块模式分类*/
+		//一.匿名闭包函数 => 好处在于可以在函数内部使用局部变量而不会覆盖外部的全局变量,也可以访问外部的全局变量。
+		//Array.reduce(function(total,currentValue,currentIndex,arr),initialValue) => 计算数组中元素的总和
+		//Array.filter(function(currentValue,currentIndex,arr,this)) => 创建一个新数组,新数组中返回指定的符合条件的所有元素
+		var global = "hello! I am a global avariable!";
+		(function() {
+			var myGrades = [93,95,88,0,55,91];
+			var average = function() {
+				var total = myGrades.reduce(function(total,item) {
+					return total + item;
+
+				},0)
+				return 'Your average grade is ' + total/myGrades.length + '.';
+			}
+			var failing = function() {
+				var failingGrades = myGrades.filter(function(item) {
+					return item < 70;
+				})
+				return 'You failed ' + failingGrades.length + ' times.';
+			}
+			console.log(failing());
+			console.log(average());
+			console.log(global);
+		})();
+
+
+		//二.全局引入 => 为保证模块之间的独立性,模块最好不要与程序的其他部分直接进行交互,当我们需要在模块的内部使用全局变量时,必须显示的将全局变量输入到模块中,这样能保证模块的独立性,还能使模块之间的依赖性变得明显
+		// Array.isArray(object) 确定对象是否为数组
+		
+		// (function(globalVariable) {
+		// 	var privateFunction = function() {
+		// 		console.log("hhhh,this is private");
+		// 	}
+		// 	globalVariable.each = function(collection,iterator) {
+		// 		if(Array.isArray(collection)) {
+		// 			iterator(collection[i],i,collection);
+		// 		} else {
+		// 			for(var key in collection) {
+		// 				iterator(collection[key],key,collection)
+		// 			}
+		// 		}
+		// 	}
+
+		// 	globalVariable.filter = function(collection,test) {
+		// 		var filtered = [];
+		// 		globalVariable.each(collection,function(item) {
+		// 			if(test(item)) {
+		// 				filtered.push(item);
+		// 			}
+		// 		});
+		// 		return filtered;
+		// 	}
+
+		// 	globalVariable.map = function(collection,iterator) {
+		// 		var mapped = [];
+		// 		globalUtils.each(collection,function(value,key,collection) {
+		// 			mapped.push(iterator(value));
+		// 		});
+		// 		return filtered;
+		// 	}
+
+		// 	globalVariable.reduce = function(collection,iterator,accumulator) {
+		// 		var startingValueMissing = accumulator === undefined;
+		// 		globalVariable.each(collection,function(item) {
+		// 			if(startingValueMissing) {
+		// 				accumulator = item;
+		// 				startingValueMissing = false;
+		// 			} else {
+		// 				accumulator = iterator(accumulator,item);
+		// 			}
+		// 		});
+		// 		return accumulator;
+		// 	}
+		// })(globalVariable);
+		
+		//三.使用对象接口
+		var myGradesCalculate = (function() {
+			//私有变量
+			var myGrades = [84,59,60,98,70,93];
+			function average() {
+				var total = myGrades.reduce(function(cacl,item){
+					return cacl + item;
+				},0);
+				return 'Your average grade is ' + total / myGrades.length + '.';
+			}
+			function failing() {
+				var gradefailing = myGrades.filter(function(item) {
+					return item < 60;
+				})
+				return 'you failed ' + gradefailing + " times";
+			}
+			//return会终止函数的执行并且返回函数的值
+			return {
+				average:　average,
+				failing: failing
+			}
+		})();
+		console.log(myGradesCalculate.average());
+		console.log(myGradesCalculate.failing());
+
+		/*四.CommonJS和AMD*/
+		//CommonJS
+		function myModule() {
+			this.hello = function() {
+				return "hello!";
+			}
+			this.goodbye = function() {
+				return "goodbye!"
+			}
+		}
+		//导出myModule模块
+		module.exports = myModule;
+		//引入myModule
+		var myModule = require("myModule");
+		//创建构造函数新实例
+		var myModuleInstance = new myModule();
+		myModuleInstance.hello(); //"hello" 
+		myModuleInstance.goodbye(); // "goodbye"
+
+		//AMD
+		//第一个参数是依赖的模块,第二个参数是加载完毕之后的回调函数,回调函数会使用载入的模块作为参数
+		define(['myModule','myOtherModule'],function(myModule,myOtherModule) {
+			console.log(myModule.hello());
+		})
+
+		define([],function() {
+			return {
+				hello: function() {
+					console.log("hello!");
+				}
+				goodbye: function() {
+					console.log("goodbye");
+				}
+			}
+		})
+
+		//UMD
+		(function(root,factory) {
+			if(typeof define === "function" && define.amd) {
+				//AMD
+				define(["myModule","myOtherModule"],factory);
+			}
+			else if(typeof exports === "object") {
+				//CommonJS
+				module.exports = factory(require('myModule'),require('myOtherModule'));
+			}
+			else {
+				//Browser global (Note:root is window)
+				root.returnExports = factory(root.myModule,root.myOtherModule);
+			}
+		}(this,function(myModule,myOtherModule) {
+			function motHelloOrGoddbye() {} //A private method
+			function hello() {}; //A public method because it's returned(see below)
+			function goodbye() {}; //A public method because it's returned(see below)
+
+			//exposed public method
+			return {
+				hello: hello,
+				goodbye: goodbye
+			}
+		}))
+
+		//原生JS
+		//lib/counter.js
+		var counter = 1;
+		function increment() {
+			counter++;
+		}
+		function decrement() {
+			counter--;
+		}
+		module.exports = {
+			counter: counter,
+			increment: increment,
+			decrement: decrement
+		};
+		//src/main.js
+		var counter = require(../../lib/counter);
+		counter.increment(); //引入的couter变量和以前的模版里的是两个不同的实例
+		console.log(counter.counter);// 1
+
+
+
+		//而通过import语句可以引入实时只读模版
+		//lib/counter.js
+		export let counter = 1;
+		export function increment() {
+			counter++;
+		}
+		export function decrement() {
+			counter--;
+		}
+		//src/main.js
+		import * as counter from '../../counter';
+		console.log(counter.counter);// 1
+		counter.increment(); 
+		console.log(counter.counter); //2
+
+
+
+		//arguments代表函数参数的集合,当它在函数内部时候,可以改变参数值
+		var M = function(a,b,c) {
+			console.log(arguments[0]);
+			console.log(a);//1
+			arguments[0] = 22;
+			console.log(a);//22
+			console.log(this)//window
+		}(1,2,3)
+
+		
+		var a = function() {
+			console.log("空空如也");
+		}
+		var a = 100;
+		console.log(a);//100
+
+		//函数表达式中的函数名称相当于是个局部变量
+		var c = 1000;
+		var f = function c() {
+			console.log("啊哈哈哈哈");
+			console.log(c);//function c() {}
+		}()
+		console.log(c);//1000
+
+		//call的参数为null时,其默认指向window对象
+		var e = 90;
+		function d() {
+			var e = 75;
+			console.log(e);    //75 ???
+			console.log(this) //window
+		}
+		d.call(null); 
+
+		function g() {
+			console.log(this === window)
+		}
+		g(); //true 
+		g.call(); //true
+		g.call(this); //true
+		g.call(window); //true
+		g.call(null); //true
+
+		//fo()函数虽然在foo函数中调用,但是fo函数是声明在全局作用域之下的,那么相应的a也是属于一个全局变量,值为undefined;属于然foo中也声明的有h值,但是它属于一个局部变量,无法在作用域之外被调用
+		// function fo() {
+		// 	console.log(h) 
+		// }
+		function foo() {
+			var h = 3;
+			// fo();
+		}
+		foo(); //undefined	
+	}
+	
+
+	/*
+		ArrayObject.slice(start,end)  从给定的数组中返回选定为元素,包含开始处元素,不包含结束处元素
+		start: 从何处开始选取,可以为负数,为负数时代表从数组末尾开始选取
+		end: 从何处开始结束,可以为负数
+	*/
+	/*
+		var t = new Array("富强","民主","文明","和谐");
+		console.log(t.slice(0,3))//"富强"，"民主","文明"
+		console.log(t.slice())//"富强"，"民主","文明","和谐"
+		console.log(t.slice(0,2))//"富强"，"民主"
+		console.log(t.slice(-3))//"民主",文明","和谐"
+		console.log(t.slice(-2))//"文明","和谐"
+	*/
+	/*
+		apply()方法接收两个参数,一个是函数运行的作用域,另外一个是参数数组
+		apply(thisObj,[,argArray]);
+
+		call()方法同apply()方法,这是接收的参数必须要列举出来才行;
+		call(thisObj,arg1,arg2);
+		call()方法可以用来代替另外一个对象调用一个方法,可以将当前对象上下文改变为thisObj指定的上下文
+
+		如果没有提供thisObj对象,则Global对象将被用作thisObj对象
+		如果函数处在非严格模式下，则指定为null或者undefinded的this值会自动指向全局对象(浏览器中就是window对象),同时值为原始值(数字，字符串，布尔值)的this对象会指向该原始值的自动包装对象。
+	*/
+	/*
+		当一个内部函数被其外部函数之外的变量引用时，就形成了闭包
+	*/
+
+	/*
+		arrayObj.join(separator);
+		将数组中的所有元素放入到一个字符串中,并将元素通过指定的字符串进行分割
+	*/
+</script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>千峰--瀑布流</title>
+</head>
+<style type="text/css">
+	body {margin: 0;padding: 0;}
+	#ul1 {width: 1080px;margin: 100px auto;}
+	li {list-style: none;width: 248px;float: left;margin-left: 10px;font-size: 14px;}
+	li div {border: 1px solid black;padding: 10px;margin-bottom: 10px;}
+	li div img {width: 225px;display: block;}
+</style>
+<body>
+	<button id="btn">下载</button>
+	<ul id="ul1">
+		<li>
+			<div>
+				<img src="image/01.jpg">
+				<p>这里是商品信息的描述</p>
+			</div>
+			<div>
+				<img src="image/01.jpg">
+				<p>这里是商品信息的描述</p>
+			</div>
+			<div>
+				<img src="image/01.jpg">
+				<p>这里是商品信息的描述</p>
+			</div>
+		</li>
+		<li>
+			<div>
+				<img src="image/01.jpg">
+				<p>这里是商品信息的描述</p>
+			</div>
+		</li>
+		<li>
+			<div>
+				<img src="image/01.jpg">
+				<p>这里是商品信息的描述</p>
+			</div>
+		</li>
+		<li>
+			<div>
+				<img src="image/01.jpg">
+				<p>这里是商品信息的描述</p>
+			</div>
+		</li>
+	</ul>
+	<script type="text/javascript">
+		// 什么时候加载第二页的数据？
+		// 当最短的那个li标签将要出窗口的底部的时候
+		window.onload = function() {
+			var oBn = document.getElementById('btn');
+			var oli = document.getElementsByTagName('li');
+
+			window.onscroll = function() {
+				// 1.计算最短li标签下边框的高度
+				var _index = getShort();
+				var iH = oli[_index].offsetTop + oli[_index].offsetHeight;
+				// 2.窗口下边框的高度
+				var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+				var windowHeight = document.documentElement.clientHeight || document.body.clientHeight;
+				if(iH <= scrollTop + windowHeight) {
+					alert('加载数据的时间点');
+				}
+			}
+
+			function getList() {
+				var xhr = new XMLHttpRequest();
+				xhr.open('get','http://www.wookmark.com/api/json/popular?',true);
+				xhr.send();
+				xhr.onreadystatechange = function() {
+					if(xhr.readystate == 4) {
+						if(xhr.status == 200) {
+							var arr = xhr.responseText;
+							for(var i = 0; i < arr.length;i++) {
+								var odiv = document.createElement('div');
+								var oimg = document.createElement('img');
+								var op = document.createElement('p');
+								if(arr[i].preview) {
+									oimg.src = arr[i].preview;
+								} else {
+									oimg.src = arr[i].image;
+								}
+
+								// 预设图片的宽高
+								oimg.style.width = '225px';
+								oimg.style.height = arr[i].height * 225 / arr[i].width + 'px';
+
+								op.innerHTML = arr[i].title;
+								odiv.appendChild(oimg);
+								odiv.appendChild(op);
+								var _index = getShort();
+								oli[_index].appendChild(odiv);
+							}
+						}
+					}
+				}
+			}
+
+			oBn.onclick = function() {
+				getList();
+			}
+
+			function getShort() {
+				var index = 0;
+				var shortHei = oli[0].offsetHeight;
+				for(var i = 0;i < oli.length;i++) {
+					if(oli[i].offsetHeight < shortHei) {
+						shortHei = oli[i].offsetHeight;
+						index = i;
+					}
+				}
+				return index;
+			}
+		}
+
+	</script>
+</body>
+</html>

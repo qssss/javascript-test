@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<style type="text/css">
+	* {
+		box-sizing: border-box;
+		margin: 0;
+		padding: 0;
+	}
+	ul {
+		position: relative;
+		overflow: hidden;
+		border-left: 1px solid #dddee1;
+		border-bottom: 1px solid #dddee1;
+		margin: 100px auto;
+	}
+	li {
+		float: left;
+		list-style: none;
+		border: 1px solid #dddee1;
+		border-left: none;
+		border-bottom: none;
+	}
+</style>
+<body>
+	<div id="menu">
+		<ul id="ul"></ul>
+	</div>
+	<button id="play">开始</button>
+	<button id="scope">积分：<span>0</span></button>
+
+<script type="text/javascript">
+	
+	// 1.创建表格
+	// 2.创建蛇
+	// 3.创建食物
+	// 4.蛇跟随效果
+	// 5.碰到自身游戏结束
+	// 6.碰到边框游戏结束
+	(function() {
+		var menu = $id('menu');
+		var ul = $id('ul');
+		var playBtn = $id('play');
+		var scope = $id('scope');
+		var grid = {
+			row: 8,
+			col: 8,
+			width: 20,
+			height: 20,
+		}
+		createGrid();
+
+		// 创建表格
+		function createGrid() {
+			for(var i = 0; i < grid.row * grid.col;i++) {
+				li = document.createElement('li');
+				ul.appendChild(li);
+				li.style.width = grid.width + 'px';
+				li.style.height = grid.height + 'px';
+			}
+			
+		}
+		ul.style.width = (grid.col * grid.width) + 'px';
+		ul.style.height = (grid.row * grid.height ) + 'px';
+	})();
+
+	
+
+	// base
+	function $id(id) {
+		return document.getElementById(id);
+	}
+
+	function $class(parent,cname) {
+		return document.getElementsByClassName(cname);
+	}
+
+	function $tag(parent,tname) {
+		return document.getElementsByTagName(tname);
+	}
+</script>
+</body>
+</html>

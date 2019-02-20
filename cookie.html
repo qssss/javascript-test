@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<script type="text/javascript">
+		var cookie = {
+			get: function(key) {
+				var cookies = s.split("; ");
+				for(var i = 0;i < cookies.length;i++) {
+					var subcookie = cookies[i].split('=');
+					var _key = subcookie[0];
+					var _value = subcookie[1];
+					if(_key == key) {
+						console.log(_value)
+					}
+				}
+			},
+			set: function(key,value,time) {
+				var date = new Date();
+				date.setDate(date.getDate() + time);
+				console.log(date);
+				document.cookie = key + '=' + value + '; ' + time + '=' + date;
+			},
+			delete: function(key) {
+				this.set(key,'',-1)
+			}
+		}
+		cookie.set('name','juanjuan',5);
+		document.cookie = 'encodeURLComponent(d)=encodeURLComponent(xiaoming)'+'; dhbigdata.com; path=/'
+	</script>
+</body>
+</html>

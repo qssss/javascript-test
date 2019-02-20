@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>事件2</title>
+</head>
+<style type="text/css">
+	html,body {
+		height: 100%;
+	}
+	#div1 {
+		width: 300px;
+		height: 300px;
+		background: #785497;
+	}
+	#div2 {
+		width: 150px;
+		height: 150px;
+		background: #356456;
+	}
+	#div3 {
+		width: 80px;
+		height: 80px;
+		background: #982736;
+	}
+
+	#div4 {
+		width: 80px;
+		height: 80px;
+		background: #364778;
+	}
+	#div5 {
+		width: 80px;
+		height: 80px;
+		background: #247668;
+	}
+</style>
+<body>
+	<button id="btn1">这是按钮btn1</button>
+	<input type="text" name="" onfocusin="myFunc(this)">
+	<div id="div1">
+		这是div1
+		<div id="div2">
+			这是div2
+			<div id="div3">这是div3</div>
+		</div>
+	</div>
+	<div id="div4">这是div4</div>
+	<div id="div5">这是div5</div>
+	<ul id="myList">
+		<li>item 1</li>
+		<li>item 2</li>
+		<li>item 3</li>
+	</ul>
+	<script type="text/javascript">
+		var eventUti = {
+			addHandler: function(elem,type,hander) {
+				if (elem.addEventListener) {
+					elem.addEventListener(type,hander,false);
+				} else if(elem.attachEvent) {
+					elem.attachEvent('on' + type,hander,false);
+				} else {
+					elem[on + type] = hander;
+				}
+			},
+			removeHander: function(elem,type,hander) {
+				if(elem.removeEventListener) {
+					elem.removeEventListener(type,hander,false);
+				} else if(elem.detachEvent) {
+					elem.detachEvent('on' + type,hander,false);
+				} else {
+					elem[on + type] = null;
+				}
+			},
+			getEvent: function(event) {
+				return event ? event : window.event;
+			},
+			getTarget: function(event) {
+				return event.target ? event.target : event.srcElement;
+			},
+			perventDefault: function(event) {
+				if(event.perventDefault) {
+					event.perventDefault();
+				} else {
+					window.event.returnValue = false;
+				}
+			},
+			stopPropagation: function(event) {
+				if(event.stopPropagation) {
+					event.stopPropagation();
+				} else {
+					event.cancelBubble = true;
+				}
+			},
+			getRelatedTarget: function(event) {
+				if(event.relatedTarget) {
+					return event.relatedTarget;
+				} else if (event.fromElement) {
+					return event.fromElement;
+				} else if (event.toElement) {
+					return event.toElement;
+				} else {
+					return null;
+				}
+			},
+			getButton: function(event) {
+				if(document.implementation.hasFeature('MouseEvents','2.0')) {
+					return event.button;
+				} else {
+					switch(event.button) {
+						case 0:
+						case 1:
+						case 3:
+						case 5:
+						case 7:
+							return 0;
+							// break; //没有break
+						case 2:
+						case 6:
+							return 2;
+							// break;
+						case 4:
+						 	return 1;
+						 	// break;
+					}
+				}
+			},
+			getWheelDelta: function(event) {
+				if(event.wheelDelta) {
+					return (client.engine.opera && client.engine.opera < 9.5 ? -event.wheelDelta : event.wheelDelta);
+				} else {
+					return -event.detail * 40; //firefox中 支持的是‘DOMMouseScroll’时间,滚轮的信息保存在detail属性中 向前滚动的时候是-3(注意跟一般浏览器相反) 向后滚动的时候是-3 
+				}
+			},
+			getCharCode: function(event) {
+				event = eventUti.getEvent(event);
+				if(typeof event.charCode == 'number') { //其它浏览器中的编码 此处在不支持的浏览器(ie8及以前)中返回的是undefined
+					return event.charCode;
+				} else {
+					return event.keyCode; //ie8及以前是在keycode中存的ASCII编码
+				}
+			}
+		}
+
+		//为什么直接点击body没有效果呢   --   body的高度不够
+		var btn1 = document.getElementById('btn1');
+		btn1.onclick = function(event) {
+			event = eventUti.getEvent(event); //获取event对象
+			eventUti.stopPropagation(event); //将event对象传入
+			alert('btn被点击了:' + event.eventPhase);
+		} // 2
+
+		// document.body.addEventListener('click',function(event) {
+		// 	alert(event.eventPhase);
+		// },true) // 1 捕获阶段
+
+		document.body.onclick = function(event) {
+			alert('body被点击了:' + event.eventPhase);
+		}// 3
+
+		// ie浏览器不支持事件捕获
+
+
+		// 为image图片加载添加事件处理程序
+		eventUti.addHandler(window,'load',function() {
+			var image = document.createElement('img');
+			eventUti.addHandler(image,'load',function(event){
+				event = eventUti.getEvent();
+				console.log(event.getTarget(event).src);
+			});
+			document.body.appendChild(image);
+			image.src = '';
+		})
+		
+		//dom0级中的处理
+
+		eventUti.addHandler(window,'load',function() {
+			var image = new Image(); //通过此种方式创建的image对象不能添加到dom树中
+			eventUti.addHandler(image,'load',function(event){
+				event = eventUti.getEvent();
+				console.log(event.getTarget(event).src);
+			});
+			image.src = '';
+		})
+
+
+		eventUti.addHandler(window,'scroll',function() {
+			if(document.compatMode = 'CSS1Compat') {
+				console.log(document.documentElement.scrollTop);
+			} else {
+				console.log(document.body.scrollTop);
+			}
+		})
+
+
+		var input = document.querySelector('input');
+		// input.onfocusin = function() {
+		// 	this.style.backgroundColor = 'red';
+		// }
+		function myFunc(s) {
+			s.style.backgroundColor = 'yellow';
+		}
+
+
+		document.ondblclick = function() {
+			console.log('dbclicked');
+		} 
+
+		var div1 = document.getElementById('div1');
+		var div2 = document.getElementById('div2');
+		var div3 = document.getElementById('div3');
+		var div4 = document.getElementById('div4');
+		var div5 = document.getElementById('div5');
+
+		div1.onmouseenter = function(event) {//鼠标事件中只有mouseenter/mouseleave没有冒泡
+			// alert('这是div1');
+			event = eventUti.getEvent(event);
+			console.log('event.clientX:' + event.clientX + ',' + 'event.clientY:' + event.clientY); //clientX是相对于客户区来说的 不包含滚动的距离
+			console.log('event.pageX:' + event.pageX + ',' + 'event.pageY:' + event.pageY); //pageX是相对于页面来说的
+			console.log('event.screenX:' + event.screenX + ',' + 'event.screenY:' + event.screenY); //pageX是相对于页面来说的
+			// console.log(event.relatedTarget);//相关目标
+		}
+		div2.onmouseenter = function() {
+			alert('这是div2');
+		}
+		div3.onmouseenter = function() {
+			alert('这是div3');
+		}
+
+
+		// ie8及更早的浏览器不支持pageX事件 但是可以通过clientX和scrollLeft计算出来
+		eventUti.addHandler(div2,'mouseover',function(event) {
+			event = eventUti.getEvent(event);
+			var pageX = event.pageX;
+			var pageY = event.pageY;
+			if(pageX === 'undefined') {
+				pageX = event.clientX + (document.body.scrollLeft || document.documentElement.scrollLeft )
+			}
+
+			if(pageY === 'undefined') {
+				pageY = event.clientY + (document.body.scrollTop || document.documentElement.scrollTop )
+			}
+			console.log(event.pageX + ':' + event.pageY);
+		})
+
+
+		//修改键
+		eventUti.addHandler(div4,'click',function(event) {
+			event = eventUti.getEvent(event);
+			var keys = [];
+			if(event.shiftKey) {
+				keys.push('shift');
+			}
+			if(event.ctrlKey) {
+				keys.push('ctrl');
+			}
+			if(event.altKey) {
+				keys.push('alt');
+			}
+			if(event.metaKey) {
+				keys.push('meta');
+			}
+			var keys = keys.join(',');
+			alert(keys);
+		})
+
+		// relatedTarget兼容性 见eventUti事件
+		eventUti.addHandler(div4,'mouseover',function(event) {
+			event = eventUti.getEvent(event);
+			console.log(eventUti.getRelatedTarget(event));
+		});
+
+		eventUti.addHandler(div5,'mousedown',function(event) {
+			event = eventUti.getEvent(event);
+			console.log(eventUti.getButton(event));
+		});
+
+		// eventUti.addHandler(document,'mousewheel',function(event) {
+		// 	event = eventUti.getEvent(event);
+		// 	//在opera9.5之前的版本号中 wheeldelta值是相反的 这里我们可以兼容一下 只有两种情况下 可以多使用三目运算符
+		// 	var wheelDelta = (client.engine.opera && client.engine.opera < 9.5 ? -event.wheelDelta : event.wheelDelta);
+		// 	console.log(wheelDelta); //鼠标向上滚动的时候 值是120 向下滚动的时候是-120
+		// });
+
+		// (function() {
+		// 	function handleMouseWheel(event) {
+		// 		event = eventUti.getEvent(event);
+		// 		var wheelDelta = eventUti.getWheelDelta(event);
+		// 		console.log(wheelDelta);
+		// 	}
+
+		// 	eventUti.addHandler(document,'mousewheel',handleMouseWheel);
+		// 	eventUti.addHandler(document,'DOMMouseScroll',handleMouseWheel);
+		// })();
+		
+
+		eventUti.addHandler(input,'keypress',function(event) {
+			console.log(event.charCode);
+			//String.fromCharCode()将指定的ASCII编码转化为字符
+			console.log(String.fromCharCode(event.charCode));
+		})
+
+		eventUti.addHandler(input,'textInput',function(event) {
+			event = eventUti.getEvent(event);
+			console.log(event.data);D
+		})
+
+		eventUti.addHandler(window,'load',function(event) {
+			var list = document.getElementById('myList');
+			eventUti.addHandler(document,'DOMSubtreeModified',function(event) {
+				event = eventUti.getEvent(event);
+				alert(event.type);
+				alert(event.target);
+			});
+			eventUti.addHandler(document,'DOMNodeRemoved',function(event) {
+				event = eventUti.getEvent(event);
+				alert(event.type);
+				alert(event.target);
+				alert(event.relatedTarget);
+			});
+			eventUti.addHandler(list.firstChild,'DOMNodeRemovedFromDocument',function(event) {
+				event = eventUti.getEvent(event);
+				alert(event.type);
+				alert(event.target);
+			});
+			// list.parentNode.removeChild(list);
+		})
+
+
+		
+
+	</script>
+</body>
+</html>

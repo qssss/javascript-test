@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>高程-面向对象的程序设计-HTML5脚本编程</title>
+	<script type="text/javascript" src="js/eventUti.js"></script>
+</head>
+<style type="text/css">
+	html {
+		height: 100%;
+	}
+	body {
+		height: 100%;
+		position: relative;
+		overflow: hidden;
+	}
+	#box1 {
+		width: 700px;
+		height: 700px;
+		float: left;
+		border: 1px solid red;
+	}
+	#box2 {
+		width: 700px;
+		height: 700px;
+		float: right;
+		border: 1px solid blue;
+	}
+</style>
+<body>
+	<div id="box1">
+		<img src="image/yichan.jpg" >
+	</div>
+	<div id="box2">
+		<img src="">
+	</div>
+
+	<div class="mediaplayer">
+		<div class="video">
+			<video id="player" src="image/video.mp4" poster="image/mymovie.png" width="300px;height="300px;>video player is not avialble</video>
+		</div>
+	</div>
+	<div class="controls">
+		<input type="button" name="" value="play" id="video-btn">
+		<span id="curtime">0</span>
+		<span id="duration">0</span>
+	</div>
+	<script type="text/javascript">
+		//跨文档的消息传递可以使用XMD
+		//核心postMessage(一条消息,一条消息接收方来自哪个域的字符串);
+		//例如：www.wrox.com向p2p.wrox.com传递消息 在p2p.wrox.com中会触发window的message事件，我们可以利用这个事件对消息进行处理
+
+
+		//p2p.wrox.com页面
+		eventUti.addHandler(window,'message',function(event) {
+			// origin表示发送消息的文本所在的域 接受消息后验证发送消息的来源是至关重要的 可以确保消息来自自己已知的页面
+			if(event.origin == 'http://www.wrox.com') {
+				//处理接收的消息
+				processMessage(event.data);
+				//向来源窗口发送回执
+				//source表示发送消息的文档的window对象的代理
+				event.source.postMessage('received!', 'http://p2p.wrox.com')
+			}
+		}) 
+
+
+		//原生拖放
+		// 拖动触发的事件有两个方面  一个是发生在拖动元素上面的 一个是发生在放置目标上的
+
+		// 在拖动元素上面会依次触发以下几个事件
+		// dragstart 按下鼠标并开始移动鼠标之后触发
+		// drag 当元素被拖动的时候触发
+		// dragend  当拖动停止的时候触发
+
+
+		//在放置目标上触发
+		// dragenter 只要元素被拖动到放置目标上就会触发
+		// dragover 只要元素不停的在放置目标上移动就会触发 一定要阻止该事件的默认行为才会触发drop事件
+		// dragleave或drop 如果元素被拖出了放置目标就会处罚dragleave 但是如果元素被放置在了目标元素上面就会触发drop
+
+		var box1 = document.getElementById('box1');
+		var box1_img = box1.getElementsByTagName('img')[0];
+		var box2 = document.getElementById('box2');
+
+		//被拖拽的元素
+		eventUti.addHandler(box1_img,'dragstart',function(event) {
+			// console.log('dragstart');
+			// event = eventUti.getEvent(event);
+			// event.dataTransfer.setData('text','image/yichan.jpg');
+			// console.log(event.dataTransfer.getData('text'));
+		})
+		eventUti.addHandler(box1,'drag',function(event) {
+			console.log('drag');
+		})
+		eventUti.addHandler(box1,'dragend',function(event) {
+			console.log('dragend');
+		})
+
+
+		//放置目标
+		eventUti.addHandler(box2,'dragenter',function(event) {
+			console.log('dragenter');
+		})
+		eventUti.addHandler(box2,'dragover',function(event) {
+			console.log('dragover');
+			eventUti.preventDefault(event); 
+			console.log('dragover');
+		})
+		eventUti.addHandler(box2,'dragleave',function(event) {
+			event = eventUti.getEvent(event);
+		})
+		eventUti.addHandler(box2,'drop',function(event) {
+
+			// 在拖动文本时,dataTransfer会自动调用setData将数据以text形式保存在文本中,
+			// 在拖动链接或者图片的时候会自动调用setData保存URL。在数据被拖动到放置目标的时候可以调用getData将数据获取出来
+			// 只有在drop事件中才可以才能读取保存在dataTransfer中的数据
+
+			eventUti.preventDefault(event);
+			var url = event.dataTransfer.getData('text');
+			console.log(url)
+			var img = document.getElementById('box2').getElementsByTagName('img')[0];
+			img.src = url; //此处不能用setAttribute
+		})
+
+
+		var player = document.getElementById('player');
+		var video_btn = document.getElementById('video-btn');
+		var curtime = document.getElementById('curtime');
+		var duration1 = document.getElementById('duration');
+		//视频的总播放时间
+		window.onload = function() {
+			//duration属性要在文件加载完成之后才能获取
+			duration1.innerHTML = player.duration;
+		}
+		
+		eventUti.addHandler(video_btn,'click',function(event) {
+			if(player.paused) {
+				player.play();
+				player.innerHTML = 'pause';
+			} else {
+				player.pause();
+				player.innerHTML = 'play';
+			}
+		})
+		setInterval(function() {
+			//已经播放的秒数
+			curtime.innerHTML = player.currentTime;
+		}, 350) 
+
+		if(player.canPlayType('audio/mpeg')) {
+			console.log('您的浏览器支持mp3格式的音频')
+		}
+
+		
+	</script>
+</body>
+</html>

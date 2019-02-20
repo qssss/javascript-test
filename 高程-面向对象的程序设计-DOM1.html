@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>高程面向对象的程序设计-DOM1</title>
+</head>
+<body class="mybody">
+	<div id="div1" >哈哈</div>
+	<div id="div2" >嘿嘿</div>
+	<input type="text" name="input1">
+	<input type="text" name="input2">
+	<p class="db user disabled"></p>
+	<button class="btn">确认</button>
+	<p class="p1" data-myname='dfg' data-appid='myid'>这段文本用了自定义数据属性</p>
+	<script type="text/javascript">
+		var obj1 = {
+			length: 3,
+			0: 'huanghuang',
+			1: 19,
+			2: 'web',
+
+		};
+		var a = Array.prototype.slice.call(obj1,0);
+		console.log(a); //["huanghuang", 19, "web"]
+
+		var obj2 = {
+			0: 'huanghuang',
+			1: 19,
+			2: 'web',
+
+		};
+		var a = Array.prototype.slice.call(obj2,0);
+		console.log(a); //[]
+
+
+		var b = {
+			length:2,
+			0:'first',
+			1:'second'
+		};
+		console.log(Array.prototype.slice.call(b,0));
+		var head1 = document.getElementsByTagName('head')[0].parentNode;
+		var head2 = document.getElementsByTagName('head')[0].ownerDocument;
+		console.log(head1); //<!DOCTYPE html>
+		console.log(head2); //指向整个文档的文档节点#document
+
+
+		/*
+
+		nodeType
+		nodeValue
+		nodeName
+		parentNode
+		childNodes
+		previousSiblings
+		NextSiblings
+		firstNode  ---   childNodes[0]
+		lastChild  ---   childNodes.length-1
+		appendChild(newNode) 如果添加的是某个已经存在的节点 那么这个节点会被移到最后一个节点的位置
+		insertBefore(newNode,参照节点)
+		replaceChild(newNode,oldNode) 被移除的节点成为返回值
+		removeChild() 被移除的节点在文档中已经不存在了
+		cloneNodes(true) 添加true执行深复制 还会复制其子节点
+
+		*/
+
+		var html = document.documentElement;
+		console.log(html == document.childNodes[1])// true
+
+		var doctype = document.doctype;
+		console.log(doctype == document.childNodes[0])// true
+		console.log(doctype == document.firstChild)// true
+
+
+		console.log(document.URL) //当前地址的URL
+		console.log(document.title) 
+		console.log(document.domain) //域名
+		console.log(document.referrer) //链接到当前页面的那个URL
+		console.log(document.anchors) //页面中所有带有name属性的a标签
+		console.log(document.forms)
+		console.log(document.images)
+		console.log(document.links) //页面中所有带有href属性的a元素
+
+
+		var divs = document.getElementsByTagName('div');
+		console.log(divs.item(0)) //<div id="div1" name="div1">哈哈</div>
+		console.log(divs[0]) //<div id="div1" name="div1">哈哈</div>
+		console.log(divs[div1])
+
+
+		var inputs = document.getElementsByTagName('input');
+		console.log(inputs.item(0)) //<input type="text" name="input1">
+		console.log(inputs[0]) //<input type="text" name="input1">
+		console.log(inputs['input1']) //<input type="text" name="input1">
+		console.log(inputs.namedItem('input1')) //<input type="text" name="input1">
+
+		document.write('这是通过document.write写入的文字')
+		document.writeln('这是通过document.writeln写入的文字') //会在文字的末尾添加一个/n换行符
+
+		/*window.onload = function() {
+			document.write('文档被重写了')
+		}*/
+
+		console.log(divs[0].nodeValue) //null
+		console.log(divs[0].nodeName == divs[0].tagName) //true
+
+		console.log(divs[0].attributes.id) //id='div1'
+		console.log(divs[0].attributes['id']) //id='div1'
+		console.log(divs[0].attributes.getNamedItem('id')) //id='div1'
+		var typ = document.createAttribute('name');
+		typ.nodeValue = 'div1';
+		divs[0].attributes.setNamedItem(typ)
+		
+
+		function outputAttributes(elem) {
+			var pairs = new Array(),
+				attrName,
+				attrValue;
+			for(var i = 0; i < elem.attributes.length;i++) {
+				attrName = elem.attributes[i].nodeName;
+				attrValue = elem.attributes[i].nodeValue;
+				if(elem.attributes.specified) { //兼容IE7 在ie7中可能会返回所有未指定的特性 而specified属性为true则返回所有指定的特性 而在其他浏览器中根本不会为这类特性生成相应的特性节点 因此都会返回true
+					pairs.push(attrName + '=' + "\"" + attrValue + "\"");
+				}
+			}
+			return pairs.join(' ');
+		}
+		console.log(outputAttributes(divs[0]));
+
+
+		var ele1 = document.createTextNode('你好呀');
+		divs[0].appendChild(ele1);
+
+		var ele2 = document.createTextNode('Amy');
+		divs[0].appendChild(ele2);
+		console.log(divs[0].childNodes.length) //3
+		console.log(divs[0].firstChild.nodeValue) //哈哈
+
+		divs[0].normalize(); //将所有的文本节点合并成一个文本节点
+
+		console.log(divs[0].childNodes.length) //1
+		console.log(divs[0].firstChild.nodeValue) //哈哈你好呀Amy
+
+		var new1 = divs[0].firstChild.splitText(4);//将一个文本节点分隔成两个文本节点
+		console.log(new1); //返回一个新的文本节点
+		console.log(divs[0].childNodes.length);
+		// new1.style.color = 'red';
+		console.log(divs[0].childNodes[0].data)
+
+
+		function loadScriptString(code) {
+			var node = document.createElement('script');
+			node.type = 'text/javascript';
+			
+			try {
+				node.appendChild(document.createTextNode(code));
+			} catch(ex) {
+				node.text = code;
+			}
+			document.body.appendChild(node);
+		}
+		loadScriptString("function sayHi(){alert('hi');}")
+
+
+		var table = document.createElement('table');
+		table.border = '1';
+		table.width = '100%';
+
+		var tbody = document.createElement('tbody');
+		table.appendChild(tbody);
+
+		var tr = document.createElement('tr');
+		tbody.insertRow(0);
+		tbody.rows[0].insertCell(0);
+		tbody.rows[0].cells[0].appendChild(document.createTextNode('cell 1.1'));
+		tbody.rows[0].insertCell(1);
+		tbody.rows[0].cells[1].appendChild(document.createTextNode('cell 1.2'));
+
+		var tr = document.createElement('tr');
+		tbody.insertRow(1);
+		tbody.rows[1].insertCell(0);
+		tbody.rows[1].cells[0].appendChild(document.createTextNode('cell 2.1'));
+		tbody.rows[1].insertCell(1);
+		tbody.rows[1].cells[1].appendChild(document.createTextNode('cell 2.2'));
+
+		document.body.appendChild(table);
+
+
+		var div01 = document.querySelector('#div1');
+		console.log(div01.innerHTML);
+
+		var divAL = document.querySelectorAll('div');
+		console.log(divAL.item(1).innerHTML);
+
+		// if(document.body.matchesSelector("body.mybody")) {
+		// 	alert('body的class是mybody');
+		// }
+
+
+		// function matchesSelector(element,selector) {
+		// 	if(element.matchesSelector) {
+		// 		return element.matchesSelector(selector);
+		// 	} else if(element.webkitMathesSeletor) {
+		// 		return element.webkitMathesSeletor(selector);
+		// 	} else if(element.msMatchesSeletor) {
+		// 		return element.msMatchesSeletor(selector);
+		// 	} else if(element.mozMathesSelector) {
+		// 		return element.matchesSelector(selector);
+		// 	} else {
+		// 		throw new Error('Not Supported');
+		// 	}
+		// } 
+		// if(matchesSelector(document.body,'mybody')) {
+		// 	alert('aaa')
+		// }
+
+
+		/*childElementCount 返回子元素的个数 不包含元素和文本节点
+		firstElementChild 返回子节点
+		lastElementChild 返回最后一个子节点
+		previousElementSibling 返回前一个兄弟元素
+		nextElementSibling 返回下一个兄弟元素*/
+
+		// 以前遍历一个元素所有的子元素
+		// var i,
+		// 	len,
+		// 	child = element.firstChild;
+
+		// while(child != element.lastChild) {
+		// 	if(child.nodeType == 1) {
+		// 		processChild(child);
+		// 	}
+		// 	child = child.nextSibling;
+		// }
+		
+		// 现在遍历元素的所有子元素
+		// var i,
+		// 	len,
+		// 	child = element.firstElementChild;
+
+		// while(child != element.lastElementChild) {
+		// 	processChild(child);
+		// 	child = child.nextElementSibling;
+		// }
+
+		//删除指定的类名 -- 此为之前的做法  
+		var p = document.getElementsByTagName('p')[0];
+		var classNames = p.className.split(/\s+/);  //将字符串转化为字符串数组 按指定的分隔符进行分割
+		for(var i = 0;i < classNames.length;i++) {
+			if(classNames[i] == 'user') {
+				var s = classNames.splice(i,1); //删除数组中指定的元素
+			}
+		}
+		p.className = classNames.join(' ');//将数组转化为字符串
+
+
+		// 现在的做法：html新增了classList属性 它还定义了以下方法
+
+		/*add(value)  将给定的字符串添加到列表中  如果存在就不加了
+		contains(value) 检测列表中是否有给定的值 如果有返回true 否则返回false
+		remove(value)  从列表中删除指定的字符串
+		toggle(value) 如果列表中已经存在给定的值 就删除它 如果列表中不存在给定的值 就添加它*/
+
+		p.classList.toggle('disabled') //简易做法
+
+		var btn = document.getElementsByTagName('button')[0];
+		console.log(document.activeElement) // <body class="mybody">
+		btn.focus();
+		btn.onclick = function() {
+			alert('按钮被点击')
+		}
+		console.log(document.hasFocus())  //测试文档是否获得了焦点
+		console.log(btn == document.activeElement) // true   指向当前获得焦点的元素
+
+		console.log(navigator.appVersion)
+
+		// window.onload = function() {
+		// 	if(document.readyState == 'complete') {
+		// 		console.log('文档已经加载完了')
+		// 	} 
+
+		// 	if(document.compatMode == 'CSS1Compat') {
+		// 		console.log('standards mode');
+		// 	} else {
+		// 		console.log('Quicks mode');
+		// 	}
+		// }
+		var head = document.head || document.getElementsByTagName('head')[0];
+
+		// alert(document.charset)
+		// alert(document.defaultCharset)
+
+
+		var p1 = document.querySelector('.p1');
+		console.log(p1.dataset); //名值对的映射
+		console.log(p1.dataset.appid) //取得自定义数据属性的值
+		console.log(p1.dataset.myname)
+
+		p1.dataset.myname = 'yourname';
+		if(p1.dataset.myname) {
+			console.log('存在哦')
+		}
+
+		// console.log(document.body.innerHTML)
+
+
+		document.innerHTML = "<style type=\"text/css\">body {background-color: red;}</style>"
+		console.log('111')
+
+		// console.log(document.body.outerHTML)
+		// div1.outerHTML = '<p>我是替换之后的body的子元素</p>'
+
+
+		divs[0].insertAdjacentHTML('beforeend','<p>这是新增</p>');
+
+		// p1.style.height = '2000px';
+		p1.scrollIntoView(true);
+		var mode = document.documentMode;
+		console.log(mode);
+		console.log(document.documentElement.contains(document.body)) //检测某个节点是不是该节点的子节点
+
+		// compareDocumentPosition() //检测节点与被参考节点之间的位置关系
+
+		console.log(document.body.compareDocumentPosition(divs[0])) //20     (表示居后的4和表示被包含的16)
+		console.log(p1.compareDocumentPosition(divs[0])) //2      divs[0]在p1的前面
+
+		var result = document.documentElement.compareDocumentPosition(document.body);
+		console.log(!!(result & 16)); //true
+
+
+		//这是一个通用的contains函数
+		// refNode是被参考的节点   otherNode是要检查的节点
+		function contains(refNode,otherNode) {
+			if(typeof refNode.contains == 'function' && (!client.engine.webkit || client.engine.webkit >=522)) {
+				return refNode.contains(otherNode);
+			} else if (typeof otherNode.compareDocumentPosition == 'function') {
+				return !!(otherNode.compareDocumentPosition(refNode) & 16);
+			} else {
+				var node = otherNode.parentNode;
+				do {
+					if(node == refNode) {
+						return true;
+					} else {
+						node = otherNode.parentNode; //递归方式
+					}
+				} while (node !== null); //在文档树的顶端parentNode等于null,所以循环结束
+				return false;
+			}
+		}
+
+		console.log(document.body.innerText);
+		// document.body.innerText = 'hah';
+
+		// document.body.innerText = 'hello & welcome,<b>\"hello\"!</b>';
+		// document.body.innerText = document.body.innerText;
+
+
+
+		// 通用的获取innerText的方法
+		function getInnerText(element) {
+			//检查元素是不是有textContent属性 如果有的话它的类型应该是 String
+			return (typeof element.textContent == 'String' ? element.textContent : element.innerText);
+		}
+
+
+		function setInnerText(element,text) {
+			if(typeof element.textContent == 'String') {
+				element.textContent = text;
+			} else {
+				element.innerText = text;
+			}
+		}
+		// getInnerText(document.body);
+		// setInnerText(document.body,'mybody');
+
+		divs[0].outerText = '嗯哼'; //跟outerHTML一样 会将元素本身替换  这里相当于将div元素删除 并将文本添加到div元素的父元素上去了
+	</script>
+</body>
+</html>

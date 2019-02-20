@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<button id="btn">发送验证码</button>
+	<script type="text/javascript">
+		var timer;
+		var now = 10;
+		var btn = document.getElementById('btn');
+		btn.onclick = function() {	
+			var This = this;
+			this.innerHTML = now + 's';
+			timer = setInterval(function() {
+				now--;
+				This.innerHTML = now + 's';
+				if(now == 0) {
+					clearInterval(timer);
+					This.innerHTML = '发送验证码';
+				}
+			},1000)
+		}
+	</script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<script type="text/javascript">
+		var a = (function() {
+			var getName = function() {
+				alert('huanghuang');
+			}
+			return { //此处一定要return
+				getName: getName
+			}
+		})(); 
+		a.getName();
+
+
+
+		(function(exports) {
+			var _ = {
+				getQueryString: function(name) {
+					console.log('sss');
+				}
+			}
+			exports._ = _;
+		})(window);
+
+		var x = 9;
+		var module = {
+			x: 81,
+			obj: function() {
+				console.log(this.x);
+			}
+		}
+		module.obj(); //81
+		var s = module.obj; //9
+
+
+		// 在低版本的浏览器中没有bind方法 我们可以自己实现一个
+
+		//第一种实现方法 高程原例子
+		if(!Function.prototype.bind) {
+			Function.prototype.bind = function(context) {
+				var _this = this;
+				var args = Array.prototype.slice.call(context);//将传入的参数转化为一个数组
+				return function() {
+					_this.apply(context,args.slice(1)); //用apply方法实现
+				}
+			}
+		}
+
+		//第二种实现方法  学习技巧 复杂一点
+		if(!Function.prototype.bind) {
+			Function.prototype.bind = function() {
+				var _this = this,
+					context = [].shift.call(arguments)//shift会删除并返回数组的第一个元素 因此会改变数组的长度
+					args = [].slice.call(arguments);//保存剩下的参数
+				return function() {
+					_this.apply(context,[].contact.call(args,[].slice.call(arguments))); //用apply方法实现
+				}
+			}
+		}
+	</script>
+</body>
+<body>

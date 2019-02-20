@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+<script type="text/javascript">
+
+//fn16
+//通过颜色获取值
+//方法一
+function getValByColor1(color) {
+	var colors = ["red","yellow","blue","blank","pink"];
+	var result;
+	for(var i = colors.length;i--;) {
+
+		if(colors[i] == color) {
+			result = i;
+			break;
+		}
+	}
+	// return result;
+	document.write(result + "<br/>");
+}
+getValByColor1("pink"); //4
+
+//方法二
+function getValByColor2(color) {
+	return {"white":0,"red":"1","yellow":2,"blue":3,"pink":4,"blank":5}[color];
+}
+var val = getValByColor2("red");
+document.write(val + "<br/>");//1
+
+//fn17
+//通过值获取颜色
+//方法一
+function getColorByVal1(val) {
+	var color = "";
+	if(val == 0) {
+		color = "red";
+	}
+	else if(val == 1) {
+		color = "yellow";
+	}
+	else if(val == 2) {
+		color = "blue";
+	}
+	else if(val == 3) {
+		color = "black"
+	}
+	else {
+		color = "pink";
+	}
+	return color;
+}
+var color1 = getColorByVal1(3);
+document.write(color1 + "<br/>"); //black
+
+//方法二
+function getColorByVal2(val) {
+	var color = "";
+	switch(val) {
+		case 0:
+			color = "red";
+			break;
+		case 1:
+			color = "yellow";
+			break;
+		case 2:
+			color = "blue";
+			break;
+		case 3:
+			color = "black";
+			break;
+		case 4:
+			color = "pink";
+			break;
+	}
+	return color;
+}
+var color2 = getColorByVal2(4);
+document.write(color2 + "<br/>"); //pink
+
+//方法三
+function getColorByVal3(val) {
+	return ["red","yellow","blue","black","pink"][val];
+}
+var color3 = getColorByVal3(2);
+document.write(color3 + "<br/>"); //blue
+
+
+//fn18
+//获取对象的属性
+//方法一
+var arr = [];i = 0;
+var colors = {"white":0,"red":"1","yellow":2,"blue":3,"pink":4,"blank":5};
+for(var key in colors) {
+	arr[i++] = key;
+}
+document.write(arr + "<br/>");
+
+//方法二
+var arr = [];i = 0;
+var colors = {"white":0,"red":"1","yellow":2,"blue":3,"pink":4,"blank":5};
+for(arr[i++] in colors) {}
+document.write(arr + "<br/>");
+
+//fn19
+//交换两个变量的值
+//方法一
+var a = 5;
+var b = 10;
+var temp = 0;
+temp = a;
+a = b;
+b = temp;
+document.write("a的值是:" + a + "<br>"); // 10
+document.write("b的值是:" + b + "<br>"); //5
+
+//方法二
+var c = 8;
+var d = 9;
+c = [d,d = c][0];
+document.write("c的值是:" + c + "<br>"); //9
+document.write("d的值是:" + d + "<br>"); //8
+
+//fn20
+var obj1 = {
+	"first" : "john",
+	"second" : "amy",
+	"third" : "lily",
+	"fourth" : "lolo"
+}
+var array1 = [];var array2 = [];
+var i = 0;
+for(var key in obj1) {
+	document.write(key + " : " + obj1[key] + "<br/>"); 
+	/*
+	first : john
+	second : amy
+	third : lily
+	fourth : lolo
+	*/
+	array1[i++] = key; // first,second,third,fourth
+	array2 += obj1[key] + "<br/>";
+	/*
+	john
+	amy
+	lily
+	lolo
+	*/
+}
+document.write(array1 + "<br/>" );
+document.write(array2 + "<br/>");
+
+
+function fun1() {
+	var a = [0,1,2,3,4,5,6];
+	/***********************注意此处是Array****************************************************/
+	Array.prototype.age = 18;
+	for(var key in a) {
+		document.write(key + ":" + a[key] + "<br/>") 
+	}
+}
+fun1();
+/*
+output
+0:0
+1:1
+2:2
+3:3
+4:4
+5:5
+6:6
+age:18
+*/
+
+function fun2() {
+	var a = [0,1,2,3,4,5,6];
+	/***********************注意此处是Array****************************************************/
+	Array.prototype.age = 18;
+	for(var key in a) {
+		//如果对象是从原型链中继承的属性或者根本没有该属性则返回false,如果某个对象具有给定名称的属性，则返回true
+		if (a.hasOwnProperty(key)) {
+			document.write("<br/>");
+			document.write(key + ":" + a[key] + ",")
+		}
+	}
+}
+fun2();
+/*
+output
+0:0,
+1:1,
+2:2,
+3:3,
+4:4,
+5:5,
+6:6,
+*/
+</script>	
+</body>
+</html>
+

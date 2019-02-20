@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>轮播图</title>
+	<link rel="stylesheet" type="text/css" href="css/轮播图.css">
+	<script type="text/javascript" src="js/jquery-1.9.1.js"></script>
+</head>
+
+<body>
+	<div class="wrap">
+		<div class="swiper-box">
+			<ul id="swiper-move" style="position: relative;;left: 0;top:0">
+				<li><a href="javascript:;"><img src="image/01.jpg"></a></li>
+				<li><a href="javascript:;"><img src="image/02.jpg"></a></li>
+				<li><a href="javascript:;"><img src="image/03.jpg"></a></li>
+				<li><a href="javascript:;"><img src="image/04.png"></a></li>
+			</ul>
+			<span id="prev" class="btn btn-prev">&lt;</span>
+			<span id="next" class="btn btn-next">&gt;</span>
+			<div class="dotted-box" id="dotted-box">
+				<span class="active" index="1"></span>
+				<span index="2"></span>
+				<span index="3"></span>
+				<span index="4"></span>
+			</div>
+		</div>
+	</div>
+<script type="text/javascript">
+
+	var btnPrev = $("#prev");
+	var btnNext = $("#next");
+	var swiperMove = $("#swiper-move");
+	var swiperBox = $(".swiper-box");
+	var dottedBox = $("#dotted-box");
+	var spans = $(".dotted-box").find("span");
+	var page = 0;//当前页
+	var totalPage = parseInt(swiperMove.width())/parseInt(swiperBox.width()) //总页数
+	var width = swiperBox.width();//每一屏的宽度
+	var timer;
+
+	//切换下一张
+	btnNext.click(function() {
+		page++;
+		if(page >= totalPage) {
+			page = 0;
+			swiperMove.animate({left : "0px"});
+		}
+		else {
+			swiperMove.animate({left : "-=" + width});
+		}
+		//不能用遍历
+		spans.eq(page).addClass("active").siblings().removeClass("active");
+	})
+
+	//切换上一张
+	btnPrev.click(function() {
+		page--;
+		if(page <= 0) {
+			page = totalPage;
+			swiperMove.animate({left : width - swiperMove.width()});
+
+		}
+		else {
+			swiperMove.animate({left : "+=" + width});
+		}
+		//不能用遍历
+		spans.eq(page - 1).addClass("active").siblings().removeClass("active");
+	})
+	
+
+	//点点切换
+	spans.click(function(){
+		$(this).addClass("active").siblings().removeClass("active");
+		var clickIndex = $(this).index();
+		var offsetLeft = (clickIndex - page);
+		swiperMove.animate({left : -offsetLeft * (width)});
+	})
+	swiperBox.mouseover(function() {
+		clearInterval(timer);
+	})
+	swiperBox.mouseout(function() {
+		timer = setInterval("btnNext.click()",2000)
+	})
+	timer = setInterval("btnNext.click()",2000)
+
+	//按钮点击切换
+	
+</script>
+</body>
+</html>

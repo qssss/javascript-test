@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<style type="text/css">
+	@media screen and (max-width: 1400px) {
+		.structural-analysis-w .section-2 {
+			margin-bottom: 0.4rem !important;
+		}
+	}
+</style>
+<body>
+	<script type="text/javascript">
+	// new XMLHttpRequest() AJAX的核心 采用异步请求的方式从服务器获取数据 无需刷新页面
+
+	var xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function() {
+		if(xhr.readyState == 4) {
+			if(xhr.status == 200) {
+				console.log(xhr.responseText)
+			} else {
+				console.log('发生错误：' + xhr.status);
+			}
+		}
+	}
+	// xhr.open('get',url,false);
+	//自定义请求头信息 在open之后send之前调用setRequestHeader
+	// xhr.setRequestHeader('Content-Type', 'application/x-www-form-unlencoded');
+	// xhr.send(null);
+
+
+	// xhr.getResponseHeader(header) //获取相应的响应头信息
+	// xhr.getAllResponseHeaders()//获取所有的响应头信息
+
+	// 对请求的url进行编码
+	// post请求的数据更多 请求的速度在相同数量的情况下数据慢一些
+	function addURLParam(url,name,value) {
+		url += (url.indexOf("?") == -1 ? "?" : "&");
+		url += encodeURIComponent(name) + "=" + encodeURIComponent(value);
+		return url;
+	}
+	url = addURLParam('www.baidu.com',"name","xxx");
+	xhr.open('get',url,false);
+	xhr.send(null);
+
+	// about
+
+	//进度事件
+
+	// lodastart  接受到响应数据的第一个字符时候触发
+	// progress	在接受响应期间持续触发
+	// about	在因为调用了about事件而导致响应中断的时候触发
+	// error 在请求发生错误的时候触发
+	// load 在接受到完整的响应数据的时候触发
+	// loadend 在通信完成或者触发了error\about\或者load事件之后触发
+
+	//load事件
+	var xhr = new XMLHttpRequest();
+	xhr.onload = function() { //可以用来替代readystatechange事件 ie不支持
+		if(xhr.status == 200) {
+			console.log(xhr.responseText);
+		} else {
+			console.log('发生错误：' + xhr.responseText);
+		}
+	}
+	xhr.open(method, url, async, user, password);
+	xhr.send(data);
+
+
+	//progress事件
+	var xhr = new XMLHttpRequest();
+	var divstatus = document.getElementById("divstatus");
+	xhr.onprogress = function(e) {
+		if(e.lengthComputable) {
+			divstatus.innerText = "Recived:" + e.position + "of" + e.totalSize + "bytes";
+		}//可以算接收数据的百分比
+	}
+	xhr.open(method, url, async, user, password);
+	xhr.send(data);
+
+
+	//跨域资源共享
+	// xhr的限制是不能跨域 -> W3C标准CORS定义了在访问跨源资源时,浏览器和服务器之间应该如何通信 -> 在使用get/post请求的时候 在头部定义一个origin: (url) 如果服务器认为请求可以接受 就在Access-Control-Allow-Origin头部中返回相同的源信息
+
+
+	//CORS
+	//ie最CORS的支持
+
+	//get 请求  使用xdr
+	var xdr = new xDomainRequest();
+	xdr.onload = function() {
+		console.log(xdr.responseText);
+	}
+	xdr.onerror = function() {
+		console.log(xdr.responseText);
+	}
+	xdr.timeout = 2000;
+	xdr.ontimeout = function() {
+		console.log('request too long');
+	}
+	xdr.open("get",url);
+	xdr.send(null);
+
+	//post 请求
+	xdr.open(post, url);
+	//xdr影响头部信息的唯一方式
+	xdr.contentType = "application/-x-www-form-unlencoded";
+	xdr.send("name1=value1&name2=value2");
+
+
+
+	// 其他浏览器对CORS的支持就是通过XHR对象来实现 同源和跨域都使用的是同一个接口 所以对本地资源的请求最好使用相对路径 以便和跨域请求的绝对路径区分开来
+	// 只需要在open方法中传入绝对的url即可 限制是不能使用setRequestHeader()来自定义头部 不能发送和接收cookie 调用getAllResponseHeaders()方法总是会返回空字符串
+
+	function getXhr(method,url) {
+		var xhr = new XMLHttpRequest(method,url);
+		if("widthCredentials" in xhr) {
+			xhr.open(method,url)
+		} else if(typeof XDomainRequest != "undefined"){
+			var xhr = new XDomainRequest(method,url);
+			xhr.open();
+		} else {
+			xhr = null;
+		}
+	};
+	var request = getXhr("get","www.baidu.com");
+	if(request) {
+		//request中已经存在一个尚未发送的请求了
+		request.onload = function() {
+			console.log(request.responseText);
+		}
+		request.send();
+	}
+
+	//其他跨域方式
+	// 1.图片ping
+	var img = new Image();
+	img.onload = img.onerror = function() {
+		console.log('loaded!')
+	}
+	img.src = "www.baidu.com/search?sad=";
+
+
+	// 2.JSONP
+	function handleResponse(response) {
+		console.log('Your are at address' + ":response.ip");
+	}
+
+	var script = document.createElement("script");
+	script.src="www.baidu.com/?callback=handleResponse";
+	document.body.appendChild(script);
+
+
+	// COMET
+
+	//使用xhr对象实现http数据流
+	function createStreamClient(url,process,finished) {
+		var xhr = new XMLHttpRequest();
+		var recived = 0;
+		xhr.onreadystatechange = function() {
+			if(xhr.readyState == 3) {
+				var result = xhr.responseText.substring(recived);
+				recived += result.length;//对每次接受到的字符数进行递增 
+			} else if(xhr.readyState == 4) {
+				finished(xhr.responseText);
+			}
+			process(recived);
+		}
+		xhr.open(method,url);
+		xhr.send(null);
+	}
+
+	var client = createStreamClient("streaming.php",function(data) {
+		alert('recived':+ data);
+	},function(data) {
+		alert("done!")
+	})
+
+	//Web Sockts 能够在浏览器和服务器之间发送少量的数据
+
+	//必须传入绝对的地址  不受同源策略的影响 只支持dom0级事件
+	var sockts = new WebSockts("ws://www.example.com/server.php");
+	sockts.send("hello world!");//简单数据直接进行发送 复杂数据必须进行序列化之后再进行发送
+	var message = {
+		time: new Date(),
+		text: "text!",
+		clientId: '22'
+	}
+	sockts.send(JSON.stringify(message));
+	//服务器向客户端发送数据时、会触发message事件、并把返回的数据保存在event.data中
+	sockts.onmessage = function(event) {
+		var data = event.data; //返回的是字符串
+	}
+
+	sockts.onopen = function() {
+		alert('Connection established');//成功建立连接时触发
+	}
+
+	sockts.onerror = function() {
+		alert('Connection error');//发生错误时触发
+	}
+
+	sockts.onclose = function(event) {
+		// event包含额外的属性: wasClean code reason  
+		// wasClean 表明连接是否已经明确的关闭
+		// code 返回的状态码
+		// reason 字符串 包含返回的信息
+		alert('Connection closed');//在连接关闭时触发
+	}
+	</script>
+</body>
+</html>

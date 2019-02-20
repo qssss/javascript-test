@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<style type="text/css">
+	* {
+		margin: 0;
+		padding: 0;
+	}
+	#menu {
+		width: 35px;
+		height: 200px;
+		position: fixed;
+		right: 0;
+		top: 50%;
+		background-color: #333;
+	}
+	li {
+		list-style: none;
+		width: 35px;
+		height: 35px;
+		margin-bottom: 15px;
+		position: relative;
+	}
+	li:hover {
+		background-color: red;
+		cursor: pointer;
+	}
+	.list {
+		width: 35px;
+		height: 35px;	
+	}
+	.lay {
+		position: absolute;
+		right: 65px;
+		top: 0;
+		height: 35px;
+		white-space: nowrap;
+		line-height: 35px;
+		font-size: 12px;
+		background-color: #333;
+		color: #fff;
+		padding: 0 12px;
+		opacity: 0;
+	}
+	.lay:after {
+		position: absolute;
+		content: "";
+		left: 100%;
+		top: 12px;
+		width: 0;
+		height: 0;
+		border: 6px solid #333;
+		border-color: transparent transparent transparent #333; 
+	}
+</style>
+<body>
+	<div id="menu">
+		<ul>
+			<li>
+				<div class="list">
+					<img src="image/5.png">
+				</div>
+				<div class="lay">我的资产</div>
+			</li>
+			<li>
+				<div class="list">
+					<img src="image/6.png">
+				</div>
+				<div class="lay">我的收藏</div>
+			</li>
+			<li>
+				<div class="list">
+					<img src="image/7.png">
+				</div>
+				<div class="lay">我看过的</div>
+			</li>
+			<li>
+				<div class="list">
+					<img src="image/8.png">
+				</div>
+				<div class="lay">我要充值</div>
+			</li>
+		</ul>
+	</div>
+<script type="text/javascript" src="js/tween.js"></script>
+<script type="text/javascript" src="js/move.js"></script>
+<script type="text/javascript">
+	var list = document.getElementById('menu').getElementsByTagName('li');
+	var lay = document.getElementsByClassName('lay');
+	for(var i = 0;i < list.length;i++) {
+		list[i].index = i;
+		list[i].onmouseenter = function() {
+			move(lay[this.index],{right: 45,opacity: 1},260,'linear');
+		}
+		list[i].onmouseleave = function() {
+			move(lay[this.index],{right: 65,opacity: 0},260,'linear')
+		}
+	}
+</script>
+</body>
+</html>

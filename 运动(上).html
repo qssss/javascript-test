@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<style type="text/css">
+	#div1 {
+		width: 100px;
+		height: 150px;
+		margin-top: 10px;
+		background-color: red;
+		position: absolute;
+		opacity: 1;
+		/*left: 100px;*/
+		/*transition: 2s linear; 动画实现方法*/ 
+	}
+</style>
+<body>
+	<button>运动</button>
+	<div id="div1"></div>
+	<script type="text/javascript" src="js/tween.js"></script>
+	<script type="text/javascript">
+
+
+
+
+		// 业务需求一
+		// var btn = document.getElementsByTagName('button')[0];
+		// var div1 = document.getElementById('div1');
+		// var timer = null;
+		// btn.onclick = function() {	
+
+		// 	timer = setInterval(() => {
+
+		// 		if(div1.style.left == '520px') {
+
+ 	// 				clearInterval(timer);
+		// 		} else {
+		// 			var left = window.getComputedStyle(div1).left;
+
+		// 			div1.style.left = parseInt(left) + 10 + 'px';
+		// 		}
+		// 	},100);
+			
+		// }
+	
+
+
+		// 业务需求二
+		// var btn = document.getElementsByTagName('button')[0];
+		// var div1 = document.getElementById('div1');
+		// var timer = null;
+		// btn.onclick = function() {	
+		// 	move(div1,'width',501,2000);
+		// 	move(div1,'height',501,2000);
+		// }
+		// function move(elem,attr,target,duration) {
+		// 	var b = parseInt(getStyle(elem,attr));
+		// 	var c = target - b;
+		// 	var d = duration;
+		// 	var starttime = now();
+		// 	var timer = setInterval(()=> {
+		// 		var changetime = now();
+		// 		var t = Math.min(changetime - starttime,d);
+		// 		if(t === d) {
+		// 			clearInterval(timer);
+		// 		}
+		// 		elem.style[attr] = t/d * c + b + 'px';
+		// 	},16);
+		// }
+		// function now() {
+		// 	//得到时间戳：到1970年1月1日的毫秒数
+		// 	return (new Date()).getTime();
+		// }
+		// function getStyle(elem,attr) {
+		// 	return window.getComputedStyle(elem)[attr];
+		// }
+
+
+		// 业务需求三
+		var btn = document.getElementsByTagName('button')[0];
+		var div1 = document.getElementById('div1');
+		var timer = null;
+		btn.onclick = function() {	
+			move(div1,{ width: 300,height: 500,opacity: .5 },2000,'bounceOut',function() {
+				move(div1,{width: 50,height: 50},2000,'bounceOut');
+			});
+		}
+		function move(elem,attrObj,duration,fx,cbFn) {
+			var bobj = {};
+			var cobj = {};
+			for(var attr in attrObj) {
+				if(attr === 'opacity') {
+					var temp = parseInt(getStyle(elem,attr)) || 1;
+				} else {
+					var temp = parseInt(getStyle(elem,attr)) || 0;
+				}
+				bobj[attr] = temp;
+				cobj[attr] = attrObj[attr] - temp;
+			}
+			var d = duration;
+			var starttime = now();
+			var timer = setInterval(()=> {
+				var changetime = now();
+				var t = Math.min(changetime - starttime,d);
+				if(t === d) {
+					if(cbFn) {
+						cbFn();
+					}
+					clearInterval(timer);
+				}
+				for(var attr in attrObj) {
+					if(attr === 'opacity'){
+						elem.style[attr] = Tween[fx](t,bobj[attr],cobj[attr],d);
+					} else {
+						elem.style[attr] = Tween[fx](t,bobj[attr],cobj[attr],d) + 'px';
+					}
+				}
+			},16);
+		}
+		function now() {
+			//得到时间戳：到1970年1月1日的毫秒数
+			return (new Date()).getTime();
+		}
+		function getStyle(elem,attr) {
+			return window.getComputedStyle(elem)[attr];
+		}
+
+
+		// 业务逻辑：
+		// 1.
+		// 业务需求：
+		// 	点击运动按钮,方块移动匀速移动到指定的位置
+		// 实现方法：
+		// 	通过使用定时器,每间隔一定的时间,将方块的left增加指定的值,通过if判断,到达指定的位置之后清除定时器
+		// 2.
+		// 业务需求：
+		// 	点击的时候增加的值是一个固定的值,因此每次获取到的值不一定就是我们指定的值，因此可能方块永远都不能停止,要求实现指定任何值,方块都必须精准的移动到指定的那个值上
+		// 实现方法：
+		// 	思路：不能增加指定的值,增加的值(变化量)应该是根据时间计算出来的一个匀速的变量，需要知道四个值:即通过公式：目标位置 = 上一次的位置 + 本次的位置
+		// 		t(current time):  当前时间
+		// 		b(beginning):  初始值
+		// 		c(change):  变化量(总位置-当前位置)
+		// 		d(duration):  总时间(持续时间)
+		// 		运动的位置(target)：t/d*c + b
+		// 3.
+		// 业务需求：要求在不多次调用的情况下,实现多个运动
+		// 实现方法：将传入的属性变成一个对象,在函数中变量循环这个对象，将对象的值依次对应
+
+
+		// offsetLeft和left的区别:
+		// offsetLeft:
+		// 	1.获取的是相对于父对象的左边距
+		// 	2.是只读的,不能设置
+		// 	3.返回的是数值
+		// left:
+		// 	1.是指相对于定位父元素的左边距
+		// 	2.是可读写的
+		// 	3.返回的值是字符串
+		// 	4.必须事先定义,而且只能定义在html结构中,才能通过style获取
+	</script>
+</body>
+</html>

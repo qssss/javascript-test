@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>事件3</title>
+</head>
+<body>
+	<div id="myDiv">Right click or ctrl+click me to get custom context menu.click anywhere else to get the default context menu.</div>
+	<ul id="mymenu" style="position: absolute;visibility: hidden;background-color: silver">
+		<li>good</li>
+		<li>great</li>
+		<li>bad</li>
+	</ul>
+	<ul id="mylist">
+		<li id="doSomething">doSomething</li>
+		<li id="goSomething">goSomething</li>
+		<li id="sayHi">sayHi</li>
+	</ul>
+	<p id="p">模拟鼠标事件</p>
+	<script type="text/javascript">
+		var eventUti = {
+			addHandler: function(elem,type,hander) {
+				if (elem.addEventListener) {
+					elem.addEventListener(type,hander,false);
+				} else if(elem.attachEvent) {
+					elem.attachEvent('on' + type,hander,false);
+				} else {
+					elem[on + type] = hander;
+				}
+			},
+			removeHander: function(elem,type,hander) {
+				if(elem.removeEventListener) {
+					elem.removeEventListener(type,hander,false);
+				} else if(elem.detachEvent) {
+					elem.detachEvent('on' + type,hander,false);
+				} else {
+					elem[on + type] = null;
+				}
+			},
+			getEvent: function(event) {
+				return event ? event : window.event;
+			},
+			getTarget: function(event) {
+				return event.target ? event.target : event.srcElement;
+			},
+			perventDefault: function(event) {
+				if(event.perventDefault) {
+					event.perventDefault();
+				} else {
+					window.event.returnValue = false;
+				}
+			},
+			stopPropagation: function(event) {
+				if(event.stopPropagation) {
+					event.stopPropagation();
+				} else {
+					event.cancelBubble = true;
+				}
+			},
+			getRelatedTarget: function(event) {
+				if(event.relatedTarget) {
+					return event.relatedTarget;
+				} else if (event.fromElement) {
+					return event.fromElement;
+				} else if (event.toElement) {
+					return event.toElement;
+				} else {
+					return null;
+				}
+			},
+			getButton: function(event) {
+				if(document.implementation.hasFeature('MouseEvents','2.0')) {
+					return event.button;
+				} else {
+					switch(event.button) {
+						case 0:
+						case 1:
+						case 3:
+						case 5:
+						case 7:
+							return 0;
+							// break; //没有break
+						case 2:
+						case 6:
+							return 2;
+							// break;
+						case 4:
+						 	return 1;
+						 	// break;
+					}
+				}
+			},
+			getWheelDelta: function(event) {
+				if(event.wheelDelta) {
+					return (client.engine.opera && client.engine.opera < 9.5 ? -event.wheelDelta : event.wheelDelta);
+				} else {
+					return -event.detail * 40; //firefox中 支持的是‘DOMMouseScroll’时间,滚轮的信息保存在detail属性中 向前滚动的时候是-3(注意跟一般浏览器相反) 向后滚动的时候是-3 
+				}
+			},
+			getCharCode: function(event) {
+				event = eventUti.getEvent(event);
+				if(typeof event.charCode == 'number') { //其它浏览器中的编码 此处在不支持的浏览器(ie8及以前)中返回的是undefined
+					return event.charCode;
+				} else {
+					return event.keyCode; //ie8及以前是在keycode中存的ASCII编码
+				}
+			}
+		}
+
+		eventUti.addHandler(window,'load',function() {
+			var div = document.getElementById('myDiv');
+			eventUti.addHandler(div,'contextmenu',function(event) {//用contextmenu事件来显示自定义菜单
+				event = eventUti.getEvent(event);
+				event.preventDefault(event);
+
+				var menu = document.getElementById('mymenu');
+				menu.style.left = event.clientX + 'px';
+				menu.style.top = event.clientY + 'px';
+				menu.style.visibility = 'visible';
+			});
+			eventUti.addHandler(document,'click',function(event) { //用click事件来隐藏自定义菜单
+				document.getElementById('mymenu').style.visibility = 'hidden';
+			})
+		})
+
+
+		// eventUti.addHandler(window,'beforeunload',function(event) {
+		// 	event = eventUti.getEvent(event);
+		// 	var msg = '您确定要离开吗？';
+		// 	event.returnValue = msg;  //对ie和firefox
+		// 	return msg; //对safari和chrome
+		// });
+		
+		eventUti.addHandler(window,'load',function(event) {
+			console.log('current orientation:' + window.orientation);
+			eventUti.addHandler(window,'orientationchange',function(event) {
+				console.log('current orientation:' + window.orientation)
+			})
+		})
+
+
+		var mylist = document.getElementById('mylist');
+		eventUti.addHandler(mylist,'click',function(event) {
+			event = eventUti.getEvent(event);
+			var target = eventUti.getTarget(event);
+			switch(target.id) {
+				case 'doSomething':
+					console.log('您点击了:' + target.id);
+					break;
+				case 'goSomething':
+					console.log('您点击了:' + target.id);
+					break;
+				case 'sayHi':
+					console.log('您点击了:' + target.id);
+					break;
+			}
+		});
+
+
+		var p = document.getElementById('p');
+		p.onclick = function() {
+			alert('hahh ')
+		}
+		//创建鼠标事件
+		var event = document.createEvent('MouseEvents');
+		//初始化鼠标事件
+		event.initMouseEvent('click',true,true,document.defaultView,0,0,0,0,0,false,false,false,false,0,null);
+		document.onclick = function() {
+			//触发事件
+			p.dispatchEvent(event);
+		}
+
+		
+		
+	</script>
+</body>
+</html>

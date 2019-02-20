@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<style type="text/css">
+* { margin: 0; padding: 0; }
+.menu, .menu ul { width: 590px; height: 470px; position: relative; overflow: hidden; margin: 50px auto; }
+.menu ul li { position: absolute; left: 0; top: 0; list-style: none; }
+.menu ul li.active { background-color: orange; }
+.menu ul li img { width: 590px; height: 470px; }
+.menu ol { position: absolute; bottom: 10px; left: 50px; overflow: hidden; }
+.menu ol li { float: left; width: 8px; height: 8px; border-radius: 50%; background-color: transparent; border: 2px solid orange; margin-right: 20px; }
+.menu ol li:hover { background-color: orange; cursor: pointer; }
+</style>
+<body>
+	<div class="menu">
+		<ul>
+			<li class="active"><img src="image/page1.jpg"></li>
+			<li><img src="image/page2.jpg"></li>
+			<li><img src="image/page3.jpg"></li>
+			<li><img src="image/page4.jpg"></li>
+			<li><img src="image/page5.jpg"></li>
+		</ul>
+		<ol>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+		</ol>
+	</div>
+	<script src="js/move.js"></script>
+	<script type="text/javascript">
+		// base
+		function $id(id) {
+			return document.getElementById(id);
+		}
+		function $class(parent,cName) {
+			return parent.getElementsByClassName(cName);
+		}
+		function $Tag(parent,telem)  {
+			return parent.getElementsByTagName(telem);
+		}
+	</script>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<style type="text/css">
+	ul {
+		display: none;
+	}
+	ul.show {
+		display: block;
+	}
+</style>
+<body>
+	<div id="box">
+		<h3>我的好友</h3>
+		<ul>
+			<li>111</li>
+			<li>222</li>
+			<li>333</li>
+		</ul>
+		<h3>我的同学</h3>
+		<ul>
+			<li>111</li>
+			<li>222</li>
+			<li>333</li>
+		</ul>
+		<h3>我的同事</h3>
+		<ul>
+			<li>111</li>
+			<li>222</li>
+			<li>333</li>
+		</ul>
+	</div>
+<script type="text/javascript">
+	var listH3 = document.getElementsByTagName('h3'); 
+	var listUl = document.getElementsByTagName('ul'); 
+	// 方案一
+	// 业务逻辑是：点击的时候，判断当前项是展开还是关闭的，如果是为展开的则展开该项，并关闭所有其他展开的项，如果是关闭的，则展开当前项
+	// var flag = true;
+	// for(var i = 0;i < listH3.length;i++) {
+	// 	listH3[i].index = i;
+	// 	listH3[i].onclick = function() {
+	// 		if(listUl[this.index].className == '') {
+	// 			for(var j = 0;j < listUl.length;j++) {
+	// 				listUl[j].className = '';
+	// 			}
+	// 			listUl[this.index].className = 'show';
+	// 		} else {
+	// 			listUl[this.index].className = '';
+	// 		}	
+	// 	}
+	// }
+
+	// 方案二
+	// 业务逻辑是：给每一项配置一个开关，各司其职，点击的时候，判断该项是展开的还是关闭的，展开则关闭，关闭则展开，每次改变的时候将状态进行更改
+	//记录本次点击的是不是上一次被点击过的，如果是取反，如果不是，则当前项取反，其它项所有的都要关闭
+	var prev = -1;
+	for(var i = 0;i < listH3.length;i++) {
+		listH3[i].index = i;
+		listH3[i].onOff = false;
+		listH3[i].onclick = function() {
+			for(var i = 0; i < listH3.length;i++) {
+				if(prev === this.index) {
+					continue;   // 跳出本次循环,不执行下面的语句
+				}
+				listUl[i].className = '';
+				listH3[i].onOff = false;
+			}
+			if(this.onOff) {
+				listUl[this.index].className = '';
+			} else {
+				listUl[this.index].className = 'show';
+			}
+			this.onOff = !this.onOff;
+			prev = this.index;
+		}
+	}
+</script>
+</body>
+</html>

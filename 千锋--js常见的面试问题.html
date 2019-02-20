@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<ul>
+		<li>111</li>
+		<li>222</li>
+		<li>333</li>
+		<li>444</li>
+	</ul>
+	<script type="text/javascript">
+		// 学习目标：
+		// 	1.闭包详解
+		// 	2.JS面向对象的几种方式
+		// 	3.ECMA6新增class关键字 和继承实现
+		// 	4.数组的冒泡排序和选择排序
+		// 	5.数组去重
+		// 	6.this关键字详解
+
+		// 一、闭包
+		// 1.什么叫做闭包
+		// 特点：
+		// 	1.函数嵌套函数
+		// 	2.内部函数可以引用外部函数的参数和变量
+		// 	3.参数和变量不会被垃圾回收机制回收
+
+
+		function aaa(a) {
+			var b = 5;
+			function bbb() {
+				alert(a);
+				alert(b);
+			}
+			return bbb; 
+		}
+		var ccc = aaa(10);
+		alert(ccc) //返回的是bbb函数  此时按道理aaa执行之后其内部形参跟变量都是要被回收的 但是当我们执行ccc的时候 依然可以获取到a、b的值
+		ccc(); //10 5
+
+		// 2.闭包的好处
+		// 1.避免全局变量的污染 尽可能少声明全局变量
+		// 	多人开发 起相同的名字 会引起冲突
+		// 2.可以让变量常驻内存 不被释放
+		// 3.可以实现私有变量、私有方法 (因为没有类) 内部函数可以访问内部变量 但是外部函数无法访问
+
+		// var c = 1;
+		// function ddd() {
+		// 	c++;
+		// 	alert(c)
+		// }
+		// ddd(); 2
+		// ddd(); 3 全局变量污染环境
+
+
+		// function ddd() {
+		// 	var c = 1;
+		// 	c++;
+		// 	alert(c);
+		// }
+		// ddd() 2
+		// ddd() 2 函数执行完成之后就从内存中销毁 不能保持c的递增
+
+
+		// function() {
+
+		// }() 这种闭包的写法是错误的 因为小括号的优先级比大括号的高
+
+		// (function() {
+
+		// })() 函数声明的闭包形式的正确的写法
+
+		// var ddd = function() {
+		// 	var c = 1;
+		// 	function eee() {
+		// 		c++;
+		// 		alert(c);
+		// 	}
+		// 	return eee;
+		// }
+		// var fff = ddd();
+		// fff(); 2
+		// fff(); 3
+		// fff(); 4 闭包让变量常驻内存 即实现c的累加 又不让c成为全局变量
+
+		// var ddd = (function() {
+		// 	var c = 1;
+		// 	return function(){
+		// 		c++;
+		// 		alert(c);
+		// 	};
+		// })()  ddd后面的部分已经被调用过了
+		// alert(ddd)  返回的是内部的匿名函数
+		// ddd(); 2 再次调用ddd执行的就是内部的匿名函数
+		// ddd(); 3
+		// ddd(); 4
+
+		//闭包的常见用法
+		// 实现输出每个li标签的下标值
+		// window.onload = function() {
+		// 	var oLi = document.getElementsByTagName('li');
+		// 	for(var i = 0;i < oLi.length;i++) {
+		// 		oLi[i].onclick = function() {
+		// 			alert(i)  4 
+		// 		} 此处输出值却是4 因为在函数执行之前 循环早已经结束
+		// 	}
+		// }
+
+		// 第一种解决办法
+		// window.onload = function() {
+		// 	var oLi = document.getElementsByTagName('li');
+		// 	for(var i = 0;i < oLi.length;i++) {
+		// 		oLi[i].index = i;
+		// 		oLi[i].onclick = function() {
+		// 			alert(this.index)  0 1 2 3
+		// 		} 
+		// 	}
+		// }
+
+		// 使用闭包原理进行实现
+		// window.onload = function() {
+		// 	var oLi = document.getElementsByTagName('li');
+		// 	for(var i = 0;i < oLi.length;i++) {
+		// 		oLi[i].onclick = (function(index) {
+		// 			return function(){
+		// 				alert(index);
+		// 			}
+		// 		})(i);
+		// 		console.log(oLi[i].onclick);
+		// 	}
+		// }
+
+		// 3.闭包的坏处
+			// 1.闭包会引发内存泄漏 (ie浏览器)
+
+			// window.onload = function() {
+			// 	var oDiv = document.getElementsById('div1');
+			// 	oDiv.onclick = function() {
+			// 		console.log(oDiv.id)
+			// 	}
+			// } 此函数为典型的闭包
+
+			// window.onload = function() {
+			// 	var oDiv = document.getElementsById('div1');
+			// 	var id = oDiv.id;
+			// 	oDiv.onclick = function() {
+			// 		console.log(id)
+			// 	}
+			// 	oDiv = null;
+			// } 这种方式能够解决内存泄漏的问题
+
+			// 二、面向对象
+			function Person(name,age,sex) {
+				this.name = name;
+				this.age = age;
+				this.sex = sex;
+			}
+			Person.prototype.showName = function() {
+				alert('我的名字是' + this.name);
+			};
+			Person.prototype.showAge = function() {
+				alert('我今年' + this.age +'岁了');
+			};
+			Person.prototype.showSex = function() {
+				alert('我的性别是' + this.sex + '的');
+			};
+			var xiaoming = new Person('xiaoming',20,'男');
+			xiaoming.showName();
+			xiaoming.showAge();
+			xiaoming.showSex();
+
+			// 继承Person构造函数 创造白领构造函数
+			function Worker(name,age,sex,job) {
+				// 继承Person所有的属性 
+				// 构造函数的伪装
+				Person.call(this,name,age,sex);
+				this.job = job;
+			}
+			
+
+			// 继承Person所有的函数
+			// [方式一:通过原型链继承]
+			// for(var i in Person.prototype) {
+			// 	Worker.prototype[i] = Person.prototype[i];
+			// }
+			// Worker.prototype.showJob = function() {
+			// 	alert('我是' + this.job);
+			// }
+
+
+			// [方式二：直接通过new Person形式继承所有的方法]
+			// Worker.prototype = new Person();
+			// Worker.prototype.showJob = function() {
+			// 	alert('我是' + this.job);
+			// }
+
+			// [方式三：Object.create()可以创建一个新对象]
+			// Worker.prototype = Object.create(Person.prototype);
+			// Worker.prototype.showJob = function() {
+			// 	alert('我是' + this.job);
+			// }
+			// var xiaohua = new Worker('xiaohua',18,'女','学生');
+
+			// 继承和多态是同一种形式的两种侧重
+			// 首先 两者均属于继承
+			// 	1.继承 更加侧重于 从父一级保留下来的属性和函数
+			// 	2.多态 更加侧重于 在原有继承的方法上 进行拓展和重写
+			
+			xiaohua.showName();
+			xiaohua.showAge();
+			xiaohua.showSex();
+			xiaohua.showJob();
+
+			
+	</script>
+</body>
+</html>

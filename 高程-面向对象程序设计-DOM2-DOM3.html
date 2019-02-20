@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>高程-面向对象程序设计-DOM2-DOM3</title>
+	<!-- <link rel="stylesheet" type="text/css" href="css/bootstrap.css"> -->
+	<style type="text/css">
+	body {
+		
+		position: relative;
+	}
+		.div1 {
+			width: 500px;
+			height: 500px;
+			border: 1px solid #784799;
+			position: relative;
+			margin-left: 20px;
+			padding: 10px;
+		}
+		.div2 {
+			width: 300px;
+			height: 300px;
+			border: 1px solid #578588;
+			margin-left: 40px;
+			position: absolute;
+			padding: 15px;
+		}
+		.p1 {
+			display: block;
+			width: 200px;
+			height: 100px;
+			border: 1px solid #748689;
+			overflow-y: scroll;
+		}
+	</style>
+</head>
+<body>
+	<div class="div1" id="div1">这是div1<div class="div2" id="div2">这是一段文字</div></div>
+	<p>这是一个p标签</p>
+	<p1 class="p1">这是一个p1标签,zhegajgjhga,zhgdhsjafga,zaukghsjgfhs,zahjkfgshfhdsg,这是一个p1标签,zhegajgjhga,zhgdhsjafga,zaukghsjgfhs,zahjkfgshfhdsg,这是一个p1标签,zhegajgjhga,zhgdhsjafga,zaukghsjgfhs,zahjkfgshfhdsg</p1>
+	<ul>
+		<li></li>
+		<li></li>
+		<li></li>
+		<li></li>
+	</ul>
+	<script type="text/javascript">
+		// var s = document.doctype.publicId;
+		// console.log(s);
+
+		// var div = document.createElement('div');
+		// div.setUserData('name','nicholas',function(operation,key,value,src,dest) {
+		// 	if(operation == 1) {
+		// 		dest.setUserData(key,value,function() {})
+		// 	}
+		// })
+
+
+		// var iframe = document.getElementById('myiframe');
+		// var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+
+		var div = document.querySelector('div');
+
+
+		//style对象的属性
+		// cssText 返回的是style特性中的css代码
+		// length 返回的是元素的css数量
+		// getPropertyValue(propertyName)  返回给定属性的字符串值
+		// getPropertyCSSValue(propertyName)
+		// getPropertyPriority(propertyName) 
+		// removeProperty();
+		// setProperty();
+		// item();
+		// parentRule();
+
+		div.style.cssText = 'color: #234323;background-color: #874597;font-size: 20px;';
+		console.log(div.style.length);//3
+
+		for(var i = 0;i < div.style.length;i++) {
+			var prop = div.style.item(i);
+			var value = div.style.getPropertyValue(prop);
+			// var a = div.style.getPropertyCSSValue(prop);//要被废弃
+			console.log(value);
+		}
+
+		console.log(div.style.cssText);
+		div.style.removeProperty('font-size');
+		div.style.setProperty('font-weight','700');
+
+		var computed = document.defaultView.getComputedStyle(div,null);
+		console.log(computed.length);
+		console.log(div.currentStyle);
+
+		for(var i = 0;i < document.styleSheets.length;i++) {
+			console.log(document.styleSheets[i].href);
+		}
+
+
+		// 也可以直接通过style或者link元素来获取样式表对象
+		// function getStyleSheet(element) {
+		// 	return element.sheet || element.styleSheet;
+		// }
+		// var link = document.querySelector('link');
+		// console.log(getStyleSheet(link));
+
+		// console.log(document.styleSheets[0].cssRules)
+
+		// function insertRule(sheet,selectorText,cssText,position) {
+		// 	if(sheet.insertRule) {
+		// 		sheet.insertRule(selectorText + "{" + cssText + "}",position);
+		// 	} else if(sheet.addRule){
+		// 		sheet.addRule(selectorText,cssText,position);
+		// 	}
+		// }
+		// insertRule(document.styleSheets[0],'body','background-color:red',0);
+
+		//跨浏览器删除规则
+		function deleteRule(sheet,index) {
+			if(sheet.deleteRule) {
+				sheet.deleteRule(index);
+			} else if(sheet.removeRule) {
+				sheet.removeRule(index);
+			}
+		}
+
+		console.log(div.offsetWidth);
+		console.log(div.offsetHeight);
+		console.log(div.clientHeight);
+		console.log(div.clientHeight);
+		console.log(div.offsetLeft);
+		console.log(div.offsetTop);
+
+		// 确定某个元素在页面的偏移量 只需要将该元素与其父元素的偏移量相加 如此循环迭代 直到根元素 就可以得到一个基本准确的值
+
+		//自己写的例子
+		function getElementLeft(element) {
+			// debugger;
+			var offset = element.offsetLeft;
+			while(element.offsetParent != null) { //首先应该搞清楚这是一个循环 而不是直接就用if条件判断语句
+				offset += element.offsetParent.offsetLeft;
+				element = element.offsetParent;
+			} 
+			return offset;
+		}
+
+		//书上的例子
+		// function getElementLeft(element) {
+		// 	// debugger
+		// 	var actualLeft = element.offsetLeft;
+		// 	var current = element.offsetParent;
+		// 	while(current!== null) {
+		// 		actualLeft += current.offsetLeft;
+		// 		current = current.offsetParent;
+		// 	}
+		// 	return actualLeft;
+		// }
+		var div2 = document.querySelector('.div2');
+		console.log(getElementLeft(div2));
+
+		//获取视口的大小 (客户区大小)
+		function getViewPort() {
+			if(document.compatMode == 'CSS1Compat') {
+				return {
+					width: document.documentElement.clientWidth,
+					height: document.documentElement.clientHeight
+				}
+			} else {
+				return {
+					width: document.body.clientWidth,
+					height: document.body.clientHeight
+				}
+			}
+		} 
+		console.log(getViewPort().width);
+
+		//滚动大小
+		var p1 = document.querySelector('.p1');
+		var div1 = document.querySelector('.div1');
+		console.log(document.body.scrollTop || document.documentElement.scrollTop);
+		console.log(p1.scrollTop);
+		
+		p1.onscroll = function() {
+			console.log(p1.scrollLeft + ',' + p1.scrollTop);
+		}
+		console.log('p1的scrollWidth值是' + p1.scrollWidth);
+		console.log('p1的scrollHeight值是' + p1.scrollHeight);
+
+
+		console.log('p1的clientWidth值是' + p1.clientWidth);
+		console.log('p1的clientHeight值是' + p1.clientHeight);
+
+		console.log('文档的scrollWidth值是' + document.documentElement.scrollWidth);
+		console.log('文档的scrollHeight值是' + document.documentElement.scrollHeight);
+
+
+		console.log('文档的clientWidth值是' + document.documentElement.clientWidth);
+		console.log('文档的clientHeight值是' + document.documentElement.clientHeight);
+
+
+		function getId(id) {
+			return document.getElementById(id);
+		}
+
+		console.log(getId('div1'));
+
+		//获取元素距离视口的距离 因为ie8及更早的版本认为浏览器左上角的坐标是(2,2),而ie9及其它浏览器则认为元素左上角的坐标是(0,0),所以我们需要检测一下
+		function getBoundingClientRect(element) {
+			if(element.getBoundingClientRect) {
+				if(typeof arguments.callee.offset != "number") {
+					var scrollTop = document.documentElement.scrollTop;
+					var temp = document.createElement('div');
+					temp.style.cssText = 'position:absolute;left:0;top:0';
+					document.body.appendChild(temp);//temp元素只是为了获取出当前文档左上角的坐标而已，即在文档的左上角定义一个元素 然后获取这个元素距离左上角的坐标 这就是我们需要的这一段可能减少的两个像素的坐标
+					arguments.callee.offset = -temp.getBoundingClientRect().top - scrollTop;
+					document.body.removeChild(temp);
+					temp = null;
+				}
+
+				var rect = element.getBoundingClientRect();
+				var offset = arguments.callee.offset;
+
+				return {
+					left: rect.left + offset,
+					right: rect.right + offset,
+					top: rect.top + offset,
+					bottom: rect.bottom + offset
+				};
+			} else {
+				var actualLeft = getElementLeft(element);
+				var actualTop = getElementTop(element);
+				return {
+					left: actualLeft - scrollLeft,
+					right: actualLeft + element.offsetWidth - scrollLeft,
+					top: actualTop - scrollTop,
+					bottom: actualTop + element.offsetHeight - scrollTop,
+				}
+			}
+			
+		}
+
+		console.log(getBoundingClientRect(div1).left);
+		document.onscroll = function(e) {
+			console.log(document.documentElement.scrollTop)
+		}
+
+		var supportsTraversal = document.implementation.hasFeature('Traversal','2.0');
+		var supportsNodeIterator = (typeof document.createNodeIterator == 'function');
+		var supportsTreeWalker = (typeof document.createTreeWalker == 'function');
+
+
+		// document.createNodeIterator(root,whatToShow,filter,entityReferenceExpansion);
+
+		// var filter = {
+		// 	acceptNode: function(node) {
+		// 		return node.tagName.toLowerCase() == 'p' ? NodeFilter.FILTER_ACCEPT:NodeFilter.FILTER_SKIP;
+		// 	}
+		// }
+
+		// var iterator = document.createNodeIterator(root,NodeFilter.SHOW_ELEMENT,filter,false);
+
+
+		//遍历body中的所有元素
+		// createNodeIterator
+		// var filter = function(node) {
+		// 	return node.tagName.toLowerCase() == 'li' ?  NodeFilter.FILTER_ACCEPT: NodeFilter.FILTER_REJECT;
+		// }
+		// var iterator = document.createNodeIterator(document.body,NodeFilter.SHOW_ELEMENT,filter,false);
+		// var node = iterator.nextNode();
+		// while(node != null) {
+		// 	console.log(node.tagName);
+		// 	node = iterator.nextNode();
+		// }
+
+		// createTreeWalker
+		var div1 = document.getElementById('div1');
+		var filter = {
+			acceptNode: function(node) {
+				return node.tagName.toLowerCase() == 'li' ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+			}
+		};
+		var iterator = document.createTreeWalker(div1,NodeFilter.SHOW_ELEMENT,filter,false);
+		var node = iterator.nextNode();
+		while(node != null) {
+			console.log(node.tagName);
+			node = iterator.nextNode();
+		}
+
+		var supportsRange = document.implementation.hasFeature('Range','2.0');
+		var alsoSupportsRange = (typeof document.createRange == 'function');
+		console.log(supportsRange);
+		console.log(alsoSupportsRange);
+
+		var div1 = document.getElementById('div1');
+		var div2 = document.getElementById('div2');
+		var body = document.body;
+		div1.onclick = function() {
+			alert('你点击了div1');
+		}
+		div2.onclick = function() {
+			alert('你点击了div2');
+		}
+		body.onclick = function() {
+			alert('你点击了body');
+		}
+	</script>
+</body>
+</html>

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>表单脚本</title>
+	<script src="js/eventUti.js"></script>
+</head>
+<body>
+	<form name="form1">
+		<ul>
+			<li><label>红色：</label><input type="radio" name="color" value="red" required></li>
+			<li><label>绿色：</label><input type="radio" name="color" value="green"></li>
+			<li><label>蓝色：</label><input type="radio" name="color" value="blue"></li>
+		</ul>
+		<p><label>姓名：</label><input type="text" name="name" placeholder="amy" size='12' maxlength="12" value="这世界上卡号的萨达"></p>
+		<p>
+			<label>喜欢的水果:</label>
+			<input type="checkbox" name="fruit" value="苹果" >苹果
+			<input type="checkbox" name="fruit" value="梨子">梨子
+			<input type="checkbox" name="fruit" value="香蕉">香蕉
+		</p>
+		<p>
+			<label>喜欢的城市：</label>
+			<select name="city" >
+				<option selected="武汉" value="武汉">武汉</option>
+				<option value="杭州">杭州</option>
+				<option value="南京">南京</option>
+			</select>
+		</p>
+		<p><input type="submit" name="subm" value="提交"></p>
+		<p><input type="reset" name="" value="重置"></p>
+		<p><textarea cols="40" rows="8" value="请输入..." name="area"></textarea></p>
+		<p><button>按钮</button></p>
+		<p><input type="image" name="" src="image/01.jpg" style="width:100px;"></p>
+		<p><label>电话号码：</label><input type="text" name="phonenumber" maxlength="11"></p>
+	</form>
+	<form name="form2">
+		<input type="text" name="" placeholder="请输入用户名" maxlength="3">
+		<input type="text" name="" placeholder="请输入电话号码" maxlength="3">
+		<input type="text" name="" placeholder="请输入密码" maxlength="3">
+		<input type="number" name="count" min='5' max="100" step="3" value="5" >
+		<select name="location">
+			<!-- value值是'' -->
+			<option value="">武汉</option>
+			<!-- value值是南京 -->
+			<option>南京</option>
+			<option value="成都">成都</option>
+		</select>
+		<div>
+			<p>你最喜欢的明星？</p>
+			<label>赵丽颖</label>
+			<input type="checkbox" name="" value="赵丽颖">
+		</div>
+	</form>
+	<div id="div">这是一个div</div>
+	<iframe src="form.html" width="400px;height: 400px;background: #789789" name="iframeForm"></iframe>
+	<script type="text/javascript">
+		//获取form的两种方式 一种是通过索引 一种是通过设置了name属性的form获取
+		// var form = document.forms[0];
+		var form = document.forms['form1'];
+		//获取表单中所有的字段
+		var formLength = form.elements.length;
+		console.log('表单一共有' + formLength + '个字段'); //12 select只算一个  单选和多选中的一个input就要算一个的
+
+		console.log(form.elements[0])
+		console.log(form.elements[1])
+		console.log(form.elements[2])
+		console.log(form.elements[3])
+		console.log(form.elements[4])
+		console.log(form.elements[5])
+		console.log(form.elements[6])
+		console.log(form.elements[7])
+		console.log(form.elements[8])
+		console.log(form.elements[9])
+		console.log(form.elements[10])
+		console.log(form.elements[11])//button
+		console.log(form.elements[12])
+
+		//button默认的type是submit
+		console.log(form.elements[11].type);
+
+		//阻止表单的提交 即阻止表单的默认行为
+		// eventUti.addHandler(document.forms[0],'submit',function(event) {
+		// 	event = eventUti.getEvent(event);
+		// 	event.preventDefault(event);
+		// })
+
+		//提交表单 除了通过点击按钮提交之外还能通过直接调用submit()方法提交
+		// form.submit(); //使用这种方法不会触发submit事件 因此我们需要在调用此方法之前先验证表单数据 
+
+		//重置表单 除了通过点击按钮重置之外还能通过直接调用submit()方法重置
+		// form.reset()
+
+		// 通过表单里面的字段的名称可以获取到某个字段 如果有多个相同的name(单选、多选) 那么返回的将是一个NodeList
+		var city = form.elements['city'];
+		var colors = form.elements['color'];
+		var fruits = form.elements['fruit'];
+		console.log(city.length);
+		console.log(colors.length);
+		console.log(fruits.length);
+		console.log(colors[0]);
+		console.log(colors[0] == form.elements[0]); // true
+		console.log(form.elements['color'][0].name); // true
+
+		console.log(form[0]); //向后兼容的方式 尽量避免使用
+
+
+		//表单字段的属性
+		console.log(city.type); // 当前字段的类型  select-one
+		console.log(city.form); //当前字段所属的form
+		console.log(city.value);
+		console.log(city.readOnly); //undifined????
+		console.log(city.disabled);
+
+		//避免多次提交表单
+		eventUti.addHandler(form,'submit',function(event) {
+			event = eventUti.getEvent(event);
+			event.preventDefault(event);//取消表单提交
+			target = eventUti.getTarget(event);
+			console.log(target.name) //form1
+			console.log(event.currentTarget) //<form name="form1"></form>
+			var btn = target.elements['subm'];
+			btn.disabled = true;
+		});
+
+		var div = document.getElementById('div');
+		// eventUti.addHandler(div,'click',function(event) {
+		// 	console.log(event.target) //div
+		// 	console.log(event.currentTarget) //div
+		// 	console.log(this) //div
+		// });
+
+		// eventUti.addHandler(document,'click',function(event){
+		// 	console.log(event.target); //div
+		// 	console.log(event.currentTarget); //document
+		// 	console.log(this); //document
+		// });
+
+		//第一个元素设置自动获取焦点 当然也可以直接设置一个属性autofcus
+		
+
+		eventUti.addHandler(window,'load',function(event){
+			var firstField = document.forms[0].elements[0];
+			if(firstField.autofocus !== true) {
+				// firstField.focus();
+			}
+		});
+
+		//blur/focus/change事件
+		// 对于input和textarea而言 元素获取焦点 失去焦点 然后文本的内容发生了改变时 才会触发onchange事件
+		var textbox = document.forms[0]['name'];
+		eventUti.addHandler(textbox,'focus',function(event) {
+			event = eventUti.getEvent(event);
+			target = eventUti.getTarget(event);
+			// target.select();
+			if(target.style.background != 'red') {
+				target.style.backgroundColor = 'yellow';
+			}
+		});
+
+		eventUti.addHandler(textbox,'change',function(event) {
+			event = eventUti.getEvent(event);
+			target = eventUti.getTarget(event);
+			var text = /[^\d]/;
+			if(text.test(target.value)) {
+				target.style.backgroundColor = 'red';
+			} else {
+				target.style.backgroundColor = '';
+			}
+		});
+
+
+		eventUti.addHandler(textbox,'blur',function(event) {
+			event = eventUti.getEvent(event);
+			target = eventUti.getTarget(event);
+			var text = /[^\d]/;
+			if(text.test(target.value)) {
+				target.style.backgroundColor = 'red';
+			} else {
+				target.style.backgroundColor = '';
+			}
+		})
+
+		// select()方法可以获取输入框中的所有文本
+		// document.forms.elements['name'].select();
+
+		// 去的选择的文本内容 可以用两个属性 selectionStart/selectionEnd
+		eventUti.addHandler(textbox,'select',function(event) {
+			event = eventUti.getEvent(event);
+			target = eventUti.getTarget(event);
+			// console.log(target.value.substring(textbox.selectionStart,textbox.selectionEnd))
+			// console.log(textbox.selectionStart,textbox.selectionEnd)
+			// console.log(textbox.setSelectionRange(0,5));
+			// textbox.focus()
+		})
+
+
+		function getSelectText(textbox) {
+			if(typeof textbox.selectionStart == 'number') {
+				return textbox.value.substring(textbox.selectionStart,textbox.selectionEnd);
+			} else if (document.selection) { //ie8及更早的版本
+				return document.selection.createRange().text;
+			}
+		}
+
+		function selectText(textbox,startIndex,endIndex) {
+			if(textbox.setSelectionRange) {
+				textbox.setSelectionRange(startIndex,endIndex);
+			} else if(textbox.createRange) {
+				var range = textbox.createRange();
+				range.collapse(true);
+				range.moveStart('character',startIndex);
+				range.moveEnd('character',endIndex - startIndex);
+				range.select();
+			}
+			textbox.focus();
+		}
+		selectText(textbox,0,2)
+		
+		var phonenumber = form.elements['phonenumber'];
+		console.log(phonenumber)
+		eventUti.addHandler(phonenumber,'keypress',function(event) {
+			event = eventUti.getEvent(event);
+			var target = eventUti.getTarget(event);
+			var charCode = eventUti.getCharCode(event);
+			console.log(String.fromCharCode(charCode));
+			if(!/\d/.test(String.fromCharCode(charCode)) && event.charCode > 9 && !event.ctrlKey) {
+				event.preventDefault(event);
+			}
+		})
+
+
+		//粘贴的时候检测粘贴的文本是不是数字 
+		var textarea = form.elements['area'];
+		eventUti.addHandler(textarea,'paste',function(event) {
+			var event = eventUti.getEvent(event);
+			var text = eventUti.getClipboardText(event);
+			if(!/^\d*$/.test(text)) {
+				event.preventDefault(event);
+			}
+		})
+
+		//立即执行函数的前面和后面的代码必须要有结束标记
+		//当前的文本框内容输满之后 立即跳到下一个文本框
+		当前的文本框内容舒曼之后 立即跳到下一个文本框
+		+(function() {//此处不能设置参数event
+			function tabForward(event) {
+				event = eventUti.getEvent(event);
+				var target = eventUti.getTarget(event);
+				var form = target.form;
+				if(target.value.length == target.maxLength) { //注意此处maxLength的写法
+					for(var i = 0;i < form.elements.length;i++) {
+						if(target == form.elements[i]) {
+							if(form.elements[i+1]) {
+								form.elements[i+1].focus();
+							}
+							return;//把控制权交给页面
+						}
+					}
+				}
+			}
+
+			var form2 = document.forms['form2'];
+			var input_name = form2.elements[0];
+			var input_num = form2.elements[1];
+			var input_psd = form2.elements[2];
+			eventUti.addHandler(input_name,'keyup',tabForward)//keyup事件
+			eventUti.addHandler(input_num,'keyup',tabForward)//keyup事件
+			eventUti.addHandler(input_psd,'keyup',tabForward)//keyup事件
+		})();
+
+		// return false  阻止执行默认的行为  相当于终止符
+ 		// return true   相当于之执行符
+
+ 		var pattern = form2.elements['count'].pattern;
+ 		var isPatternSupport = 'pattern' in document.createElement('input');
+ 		console.log(isPatternSupport); 
+
+ 		// checkValidity()方法检测某个字段是否有效 可以单独用在表单上面 则可以检测整个表单字段是否有效
+ 		if(form2.checkValidity()) {
+ 			console.log('表单数据有效')
+ 		} else {
+ 			console.log('表单数据无效')
+ 		};
+
+ 		// novalidate属性用在表单上 表示不进行验证
+ 		// formnovalidate属性用在单个的字段中 表示不进行验证
+ 		var selection = form2.elements['location'];
+ 		eventUti.addHandler(selection,'change',function(event) {
+ 			event = eventUti.getEvent(event);
+ 			var target = eventUti.getTarget(event);
+ 			//注意 这个select表单中 武汉的value为空 虽然其文本值是武汉 其值依然是value的值'';
+ 			console.log(target.value);
+ 			//当前选中项的获取方式 selectedIndex始终保存着当前选中的第一项的值
+ 			var selectionValue = selection.options[selection.selectedIndex];
+ 			console.log('当前的选中项的文本是：' + selectionValue.text)
+ 		}); 
+ 		// 推荐selection选项的文本和值的取得方式
+ 		var text = selection.options[0].text;
+ 		var value = selection.options[0].value;
+ 		
+
+ 		// 取得选择项
+ 		function getSelectedOptions(selectbox) {
+ 			var arr = [];
+ 			for(var i = 0; i < selectbox.options.length;i++) {
+ 				if(selectbox.options[i].selected) {
+ 					arr.push(selectbox.options[i]);
+ 				}
+ 			}
+ 			return arr;
+ 		}
+
+ 		var result = [8,19,390,487];
+ 		console.log(result[4]) //undefined
+ 		console.log(result[3]) //487
+
+ 		//添加选项
+ 		var newOption1 = document.createElement('option');
+ 		newOption1.appendChild(document.createTextNode('new option1'))
+ 		
+ 		newOption1.value = 'new option1 value';
+ 		selection.appendChild(newOption1);
+
+ 		var newOption2 = new Option('new option2','new option2 value');
+ 		selection.appendChild(newOption2);
+
+ 		var newOption3 = new Option('new option3','new option3 value');
+ 		selection.add(newOption3,undefined);
+
+ 		//移除选项
+ 		// removeChild(child: Node)
+ 		// remove(index)
+
+ 		//移动选项
+ 		//将第三项移动到最后
+ 		var option_3 = selection.options[2];
+ 		selection.appendChild(option_3);
+ 		//将第四项移动到第三项
+ 		var option_4 = selection.options[3];
+ 		selection.insertBefore(option_4, option_3);
+
+ 		//实现表单序列化
+ 		function serialize(form) {
+ 			var parts = [],
+ 				field = null,
+ 				optValue = null,
+ 				option = null;
+ 			for(var i = 0;i < form.elements.length;i++) {
+ 				field = form.elements[i];
+ 				switch(field.type) {
+ 					case 'select-one':
+ 					case 'select-multiple':
+ 						if(field.name.length) {
+ 							for(var j = 0;j < field.options.length;j++) {
+ 								option = field.options[j];
+ 								if(option.selected) {
+ 									if(option.hasAttribute) {
+ 										optValue = option.hasAttribute('value') ? option.value : option.text;
+ 									} else {
+ 										optValue = option.attributes['value'].specified ? option.value : option.text;
+ 									}
+ 									parts.push(encodeURIComponent(field.name) + '=' + encodeURIComponent(field.text))
+ 								}
+ 							}
+ 						}
+ 						break;
+ 					case undefined: //字段集
+ 					case 'file': 
+ 					case 'button':
+ 					case 'reset':
+ 					case 'submit':
+ 						break;
+ 					case 'radio':
+ 					case 'checkbox':
+ 						if(!field.checked) {
+ 							break;
+ 						}
+ 					default:
+ 						//不包含没有名字的表单字段
+ 						if(field.name.length) {
+ 							parts.push(encodeURIComponent(field.name) + '=' + encodeURIComponent(field.text));
+ 						}
+ 				}
+ 			}
+ 			// return parts.join('&');
+ 			console.log(parts.join('&'))
+ 		}
+ 		eventUti.addHandler(form1.elements['subm'],'submit',function() {
+ 			serialize(form1);
+ 		});
+ 		
+
+ 		//富文本编辑 此处涉及到了跨域
+ 		// eventUti.addHandler(window,'load',function() {
+ 		// 	frames['iframeForm'].document.designMode = 'on';
+ 		// });
+
+	 	
+	</script>
+</body>
+</html>

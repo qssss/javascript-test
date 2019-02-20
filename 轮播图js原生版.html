@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>轮播图</title>
+	<link rel="stylesheet" type="text/css" href="css/轮播图.css">
+</head>
+
+<body>
+	<div class="wrap">
+		<div class="swiper-box">
+			<ul id="swiper-move" style="position: relative;;left: 0;top:0">
+				<li><a href="javascript:;"><img src="image/01.jpg"></a></li>
+				<li><a href="javascript:;"><img src="image/02.jpg"></a></li>
+				<li><a href="javascript:;"><img src="image/03.jpg"></a></li>
+				<li><a href="javascript:;"><img src="image/04.png"></a></li>
+			</ul>
+			<span id="prev" class="btn btn-prev">&lt;</span>
+			<span id="next" class="btn btn-next">&gt;</span>
+			<div class="dotted-box" id="dotted-box">
+				<span class="active" index="1"></span>
+				<span index="2"></span>
+				<span index="3"></span>
+				<span index="4"></span>
+			</div>
+		</div>
+	</div>
+<script type="text/javascript">
+
+	var btnPrev = document.getElementById("prev");
+	var btnNext = document.getElementById("next");
+	var swiperMove = document.getElementById("swiper-move");
+	var dottedBox = document.getElementById("dotted-box");
+	var spans = dottedBox.getElementsByTagName("span");
+	var index = 0;
+	
+	//图片移动动画
+	function animate(offsetleft) {
+		var left = parseInt(swiperMove.style.left) - offsetleft;
+		swiperMove.style.left = left + "px";
+		if(left < -1800) {
+			swiperMove.style.left = 0 + "px";
+		}
+		if(left > 0) {
+			swiperMove.style.left = -1800 + "px";
+		}
+	}
+
+	//点点切换
+	function dottedSwitch() {
+		for(var i = 0; i< spans.length;i++) {
+			if(spans[i].className = "active") {
+				spans[i].className = "";
+			}
+			spans[index].className = "active";
+		}
+	}
+
+	//切换下一张
+	function getNext() {
+		animate(600);
+		index++;
+		if(index > 3) {
+			index = 0; //此处是一个等号表示赋值,而不是两个等号
+		}
+		if(index < 0) {
+			index = 3;
+		}
+		dottedSwitch();
+	}
+
+	//切换上一张
+	function getPrev() {
+		animate(-600);
+		index--;
+		if(index > 3) {
+			index = 0;
+		}
+		if(index < 0) {
+			index = 3;
+		}	
+		dottedSwitch();
+	}
+
+	btnNext.onclick = getNext;
+	btnPrev.onclick = getPrev;
+	
+
+	//按钮点击切换
+	function btnShow() {
+		for(var i = 0;i < spans.length;i++) {
+			//设置元素的index值
+			spans[i].index = i;
+			spans[i].onclick = function() {
+				// var TagIndex = this.getAttribute("index");获取自定义的index属性
+				var clickIndex = this.index;
+				for(var j = 0; j < spans.length;j++) {
+					//className可以用来获取元素的class,而不只是用getAttribute
+					if(spans[j].className == "active") {
+						spans[j].className = "";
+					}
+				}
+				this.className = "active";
+				var newIndex = clickIndex - index;
+				var newOffsetLeft =  parseInt(newIndex * 600);
+				if(newIndex >= 0) {
+					newOffsetLeft = newOffsetLeft;
+				} else {
+					newOffsetLeft = -newOffsetLeft;
+				}
+				animate(newOffsetLeft);
+				index = clickIndex;
+			}
+		}
+	}
+	btnShow();
+
+	var timer = setInterval(getNext,3000);
+	swiperMove.onmouseout = setInterval(getNext,3000);
+	swiperMove.onmouseover = clearInterval(timer);
+</script>
+</body>
+</html>

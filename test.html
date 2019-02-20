@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+</head>
+<body>
+	<script type="text/javascript">
+		//后测试循环
+		var m = 0;
+		do {
+			m++;
+			console.log(m);
+		}while(m<5);
+
+		//前测试循环
+		s=30;
+		while(s< 35) {
+			console.log(s);
+			s++;
+		};
+
+		var count = 25;
+		for(var count = 0;count< 30;count++) {
+			console.log(count);
+		}
+		console.log(count);
+
+
+		for(var prop in window) {
+			// console.log(prop)
+		}
+
+
+		var num = 0;
+		outermost:
+		for(var i = 1;i<10;i++) {
+			for(j = 1;j< 10;j++) {
+				if(i == 5 && j == 5) {
+					continue outermost;
+				}
+				num++;
+			}
+		}
+		console.log(num)//76   81-5;
+
+
+		with(location) {
+			console.log(href);
+			console.log(hash);
+		};
+
+		function add(num1,num2) {
+			return; //会返回undefined 用于需要提前停止函数 但是又不需要返回值的情况
+		}
+
+		function foo(arg1,arg2,arg3) {
+			console.log(arguments.length)//2;
+			console.log(foo.length);//3
+		}
+		foo(3,9);
+
+
+		var fd = 6;
+		df = fd;
+		console.log(df);
+
+
+		var obj1 = {name:"xxx"};
+		obj2 = obj1;
+		console.log(obj2);
+		obj1.name = "huang";
+		console.log(obj2);
+
+		function bar(obj1,num1) {
+			obj1.name = "haha";
+			console.log(obj1.name);
+		}
+		bar(obj1);
+		console.log(obj1)
+		console.log(obj2)
+
+
+		var arr1 = [0,2,3,4,23,2321,123,856];
+		console.log(arr1 instanceof Array); // true
+		console.log(typeof arr1);// object
+	</script>
+</body>
+</html>

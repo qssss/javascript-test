@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script type="text/javascript" src="js/eventUti.js"></script>
+</head>
+<body>
+	<form name="form1" >
+		<ul>
+			<li><label>红色：</label><input type="radio" name="color" value="red" required></li>
+			<li><label>绿色：</label><input type="radio" name="color" value="green"></li>
+			<li><label>蓝色：</label><input type="radio" name="color" value="blue"></li>
+		</ul>
+		<p><label>姓名：</label><input type="text" name="name" placeholder="amy" size='12' maxlength="12" value="这世界上卡号的萨达"></p>
+		<p>
+			<label>喜欢的水果:</label>
+			<input type="checkbox" name="fruit" value="苹果" >苹果
+			<input type="checkbox" name="fruit" value="梨子">梨子
+			<input type="checkbox" name="fruit" value="香蕉">香蕉
+		</p>
+		<p>
+			<label>喜欢的城市：</label>
+			<select name="city" >
+				<option selected="武汉" value="武汉">武汉</option>
+				<option value="杭州">杭州</option>
+				<option value="南京">南京</option>
+			</select>
+		</p>
+		<p><input type="submit" name="subm" value="提交"></p>
+		<p><input type="reset" name="" value="重置"></p>
+		<p><textarea cols="40" rows="8" value="请输入..." name="area"></textarea></p>
+		<p><button>按钮</button></p>
+		<p><input type="image" name="" src="image/01.jpg" style="width:100px;"></p>
+		<p><label>电话号码：</label><input type="text" name="phonenumber" maxlength="11"></p>
+	</form>
+	<script type="text/javascript">
+		// debugger;
+		// form1.elements['subm'].onsubmit = function() {
+		// 	alert('111')
+		// }
+		var form1 = document.forms['form1'];
+		var subm = form1.elements['subm'];
+		eventUti.addHandler(subm,'submit',function() {
+			alert('111');
+			debugger;
+			
+		});
+		// serialize(form1);
+	</script>
+</body>
+</html>

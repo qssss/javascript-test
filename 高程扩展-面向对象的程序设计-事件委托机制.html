@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>事件委托/代理机制</title>
+</head>
+<style type="text/css">
+	#box {
+		border: 1px solid #745998;
+		margin: 20px 0;
+		padding: 20px;
+	}
+	#ul li {
+		background-color: rgb(96, 152, 121);
+	}
+</style>
+<body>
+	<p id="p1">这是一个段落</p>
+	<ul id="ul">
+		<li>111</li>
+		<li>222</li>
+		<li>333</li>
+	</ul>
+	<div id="box">
+		<button id="add">添加</button>
+		<button id="delete1">删除</button>
+		<button id="move">移动</button>
+		<button id="select">选择</button>
+	</div>
+
+	<script type="text/javascript">
+		var p1 = document.getElementById("p1");
+		
+		//事件委托机制 取快递(前台代收 统一分配)  这里需要注意的是不管是老员工可以在这里去到快递 就算是新的员工 之前没有在这里拿过快递的 前台也会核对之后 让新员工拿到快递
+		// 利用事件冒泡机制来实现的 当我们在点击页面上的一个元素的时候 元素会往父级上面不断冒泡 那么如果我们把事件绑定在父级元素上面的话 子项被点击之后就会触发父级的这个事件 也就是事件委托 委托父级代为执行事件
+
+		// document.addEventListener("click",function(e) {
+		// 	console.log(e.target) // <p id="p1">这是一个段落</p>
+		// 	console.log(e.currentTarget) // #document
+		// })
+
+		var ul = document.getElementById("ul");
+		ul.addEventListener("click",function(e) {
+			// console.log(e.target) //注意ie是event.srcElement
+			// console.log(e.currentTarget)；
+			if(e.target.nodeName.toLowerCase() == "li") {
+				console.log("li被点击了");
+			}
+		})
+
+		//如果我们需要让子项执行不同的操作 也可以只绑定一个事件
+		// 减少了dom的操作 四个按钮 至少需要四次dom操作
+		var box = document.getElementById("box");
+
+		function add() {
+			console.log("添加");
+		}
+		function delete1() {
+			console.log("删除");
+		}
+		function move() {
+			console.log("移动");
+		}
+		function select() {
+			console.log("选择");
+		}
+
+		box.addEventListener("click",function(e) {
+			e = e || window.e;
+			target = e.target || e.srcElement;
+			switch(target.id) {
+				case "add":
+					add();
+					break;
+				case "delete1":
+					delete1();
+					break;
+				case "move":
+					move();
+					break;
+				case "select":
+					select();
+					break;
+			}
+		});
+
+		//新增的dom节点在通过事件委托和不使用事件委托来绑定事件的时候的区别
+
+		//1.一般情况下的事件绑定
+		var list = ul.getElementsByTagName("li");
+		for(var i = 0;i < list.length;i++) {
+			list[i].onmouseover = function() {
+				this.style.color = "red";
+			}
+			list[i].onmouseout = function() {
+				this.style.color = "#ccc";
+			}
+		}
+		//现在我们新增一个text为444的li标签
+		var li = document.createElement("li");
+		li.innerHTML = "444";
+		ul.appendChild(li); //我们可以看到新标签根本没有绑定上这个事件 这个时候事件委托的优势就来了 这里其实也可以把for循环包装到一个函数中去 然后在新增标签之后 再执行一遍函数 但是显然没有事件委托方便
+
+		//现在我们使用事件委托来实现上面的操作
+		ul.addEventListener("mouseover",function(e) {
+			e = e || window.e;
+			target = e.target || e.srcElement;
+			target.style.backgroundColor = "#478599";
+		})
+		ul.addEventListener("mouseout",function(e) {
+			e = e || window.e;
+			target = e.target || e.srcElement;
+			target.style.backgroundColor = "#609879";
+		})
+
+		//新增一个555 我们可以发现新增的标签都被绑定上了事件 这个就是事件委托的精髓所在 我们不需要遍历元素 只需要给元素的父级添加事件 所有的一切都只需要父级代为操作即可 可以减少了对dom的操作
+		var li = document.createElement("li");
+		li.innerHTML = "555";
+		ul.appendChild(li);
+
+	</script>
+</body>
+</html>

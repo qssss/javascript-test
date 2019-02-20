@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>javascript设计模式</title>
+</head>
+<style>
+    #content {background: #fff;box-shadow: 0 0 3px  rgba(0,0,0,.4);width: 200px;
+    height: 150px;padding: 10px;font-size: 14px;color: #515151;}
+    #ok {display: inline-block;background: red;color: #fff;padding: 5px 8px;cursor: pointer;}
+    #cancel {display: inline-block;background: green;color: #fff;padding: 5px 8px;cursor: pointer;}
+</style>
+<body>
+    <button id='btn'>点我</button>
+    <!-- 1.什么是设计模式 
+        是一种设计程序的思维方式。
+    2.有哪几种常见的设计模式
+        a.单例的设计模式 --- 铁打的黑板 流水的学生 --在何时何地都是访问的同一个对象的就是单例
+            alert('haha');
+            alert('heihei');
+            何时何地调用alert函数弹窗警告框，只有文本框内容发生变化，其他部门没有变化
+            我们不能同时调用两个警告框
+            可以用闭包实现 将变量保存在内存中 
+            优点：
+                1.在内存里面只有一个实力，减少了内存的开销，尤其是频繁的创建和销毁实例
+                2.避免对资源的多重占用
+            缺点：
+                没有接口，不能继承，与单一职责原则冲突，一个单例应该只关心内部逻辑，而不关心外部怎么来实例化
+
+        b.代理模式 --- 火车票代售点 --- 委托 代售点 买票
+            委托方 -- 发布任务
+            代理方 -- 执行任务
+
+        c.适配器模式 ---读卡器、手机转usb口
+            优点: 
+                1.可以让任何两个没有关联的(对象和方法)一起运行
+                2.提高了代码的复用
+                3.增加了代码的透明度
+                4.灵活性好
+
+            缺点:过度的使用适配器 会让系统非常凌乱 不易整体把握
+        
+        d.观察者模式  ---- 发布订阅模式 它定义了一种一对多的关系 让多个观察者对象同时监听一个主题对象 
+        这个主题对象的状态发生变化的时候 就会通知所有的观察者兑现 使得他们能够自动更新自己
+
+        例子：在定位模块中的应用 当你的定位发生变化 那么饿了么页面搜索出来的商家也会随之发生变化
+
+        模式作用
+            1.支持简单的广播通信 自动通知所有已经订阅过的对象
+            2.页面载入后目标对象与观察者存在一种动态关联 增加了灵活性
+                例如 订阅了天气预报
+            3.目标对象对观察者之间的抽象耦合关系能够单独的扩展及重用
+                例如 你换手机了 只要账号不变 还是可以接受订阅信息
+
+
+        e.构造设计模式  解决js中没有类的问题
+            所有通过new调用的函数都叫做构造函数
+            1.首字母大写
+            2.调用 通过new运算符调用
+            3.添加函数 通过prototype原型添加
+
+             -->
+        
+    <script>
+        // 1.单例模式 -- 弹框模式 -- 何时何地访问的都是同一个对象
+        var btn = document.getElementById('btn');
+        btn.onclick = function() {
+            singleton();
+        };
+        //内部函数引用外部函数中的变量 导致变量不能被释放 一直保存在内存中 就构成了闭包
+        var singleton = (function() {
+            var content = null;
+            function createDiv() {
+                if(!content) {
+                    content = document.createElement('div');
+                    content.id = 'content';
+                    content.innerHTML = '您确认要删除吗？';
+                    var okSpan = document.createElement('span');
+                    okSpan.id = 'ok';
+                    okSpan.innerHTML = '确认';
+                    var cancelSpan = document.createElement('span');
+                    cancelSpan.id = 'cancel';
+                    cancelSpan.innerHTML = '取消';
+                    content.appendChild(okSpan);
+                    content.appendChild(cancelSpan);
+                    document.body.appendChild(content);
+                }
+            }
+            return createDiv;
+        })();
+
+        // 2.代理模式 
+        // 委托人 --- 发布任务
+        // 代理人 --- 执行任务
+
+
+        // 男孩委托他人帮喜欢的女孩送信
+        var BeautyGirl = function(name) {
+            this.name = name;
+        }
+        var Boy = function(girl) {
+            this.girl = girl;
+            this.sendEmail = function(email) {
+                console.log(girl + '您有一封信' + email);
+            }
+        }
+        var ProxyObj = function(girl) {
+            this.girl = girl;
+            this.sendGift = function(email) {
+                new Boy(this.girl).sendEmail(email);
+            }
+        }
+        new ProxyObj('刘诗诗').sendGift('吴奇隆说他喜欢你');
+
+        //使用代理模式去加载图片
+        window.onload = function() {
+            var myImg = (function() {
+                var imgNode = document.createElement('img');
+                document.body.appendChild(imgNode);
+                return {
+                    setSrc: function(src) {
+                        imgNode.src = src;
+                    }
+                }
+            })();
+            //img想设置src 但是它不会 希望通过代理帮助它加载图片
+            var ProxyImg = function() {
+                var img = new Image();
+                //将图片全部架子啊到内存中后加载的方法
+                img.onload = function() {
+                    myImg.setSrc(this.src);
+                }
+                return {
+                    setSrc: function(src) {
+                        myImg.setSrc("img/await");
+                        img.src = src;
+                    }
+                }
+            }
+            // ProxyImg.setSrc("img/show.png");
+        }
+        
+
+        // 3.适配器模式 ---读卡器、手机转usb口
+
+        var sum = function(v1,v2) { //老项目中的求和方法 非常难用
+            return v1 + v2;
+        }
+
+        var add = function(v1,v2) { //在不修改老项目求和方法的情况下 拓展新的方法
+            return sum(v1,v2);
+        }
+
+        //老项目中的青岛区
+        var getQingdaoCity = function() {
+            var QingdaoCity = [
+                {name:'市北区',id:1},
+                {name:'市南区',id:2}
+            ]
+            return QingdaoCity;
+        }
+        //渲染数据的函数  老项目 很难用
+        var render = function(fn) {
+            document.write(JSON.stringify(fn()));
+        }
+        // render(getQingdaoCity);
+
+        //青岛市还是扩建了  城市范围新增了崂山区、黄岛区
+        // 数据输出格式：{'市南区':1,'市北区':2,'黄岛区':3,'崂山区':4}
+        var getNewQingdaoCity = function(oldCityFunc) {
+            var newQingdaoCity = {"黄岛区":3,"崂山区":4},
+                oldQingdaoCity = oldCityFunc();
+            for(var i = 0;i < oldQingdaoCity.length;i++) {
+                newQingdaoCity[oldQingdaoCity[i].name] = oldQingdaoCity[i].id;
+            }
+            return function() {
+                return newQingdaoCity;
+            }
+            
+        }
+        render(getNewQingdaoCity(getQingdaoCity));
+
+        
+
+        // 主播上线推送消息
+        //创建服务器  主播
+        function Observer() {
+            this.funcs = [] //存放所有的订阅者
+        }
+
+        //通过原型 给服务器添加方法
+        Observer.prototype = {
+            //添加订阅方法
+            subscribe: function(fn) {
+                this.funcs.push(fn);
+            },
+            unsubscribe: function(fn) {
+                //通过filter犯法进行过滤 找出取消订阅的 剔除
+                this.funcs = this.funcs.filter(function(item) {
+                    if(item != fn) {
+                        return item;
+                    }
+                })
+            },
+            update: function(msg) {
+                //遍历所有的订阅者 通知大家
+                this.funcs.forEach(function(item) {
+                    item(msg)
+                })
+            }
+        }
+        // 测试
+        var o = new Observer();
+        var f1 = function(data) {
+            console.log('小明' + data + '哇！小姐姐，你真好看，我订阅了你，每天要看你');
+        }
+        var f2 = function(data) {
+            console.log('小红' + data + '终于等到你，我的女神'); 
+        }
+
+        //1.建立关系
+        o.subscribe(f1);
+        o.subscribe(f2);
+
+        // 2.发布直播
+        o.update("我是萌小七主播，我上线啦");
+
+        //3.取消订阅
+        o.unsubscribe(f2);
+        o.update("再次推送消息的时候");
+    </script>
+</body>
+</html>

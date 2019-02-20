@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>九九乘法表</title>
+	<style type="text/css">
+		td {
+			padding: 5px;
+			border: 1px solid #dddee1;
+		}
+	</style>
+</head>
+<body>
+	<h1>第一种：乘法表纵向排列法</h1>
+	<table id="table"></table>
+	
+	<h1>第二种：乘法表横向排列法</h1>
+	<div id="box"></div>
+</body>
+<script type="text/javascript">
+	//第一种 乘法表纵向排列法
+	var item;
+	var inow;
+	var box = document.getElementById("box");
+	var table = document.getElementById("table");
+	for(var i = 1; i <= 9;i++) {
+		for(j = i; j <= 9;j++) {
+			item = i + "x" + j + "=" + i * j;
+			if(i == inow + 1) {
+				var td = document.createElement("td");
+				td.innerHTML = item;
+				trs[j-1].appendChild(td);
+				table.appendChild(tr);
+			} else {
+				var tr = document.createElement("tr");
+				var td = document.createElement("td");
+				td.innerHTML = item;
+				tr.appendChild(td);
+				table.appendChild(tr);
+				var trs = document.getElementsByTagName("tr");
+			}
+
+		}
+		inow = i;
+	}
+	//第一种 乘法表横向排列法
+	for(var i = 1;i <= 9;i++) {
+		for(j = 1; j <= i;j++) {
+			box.innerHTML += i + "x" + j + "&nbsp&nbsp&nbsp";
+		}
+		box.innerHTML += "<br/>"
+	}
+
+	
+</script>
+</html>

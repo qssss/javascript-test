@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>call、bind、apply方法详解</title>
+</head>
+<style type="text/css">
+	
+</style>
+<body>
+	<script type="text/javascript">
+		// call、bind、apply方法的作用是改变函数运行时this函数的作用域
+
+		//首先说明this
+		// 1.方法调用模式(对象调用模式)
+		var a = 1;
+
+		var obj = {
+			a: 2,
+			fn: function() {
+				console.log(this.a);
+			}
+		}
+		obj.fn(); // 2 this指的是当前调用该方法的对象 实际上相当于 obj.fn.call(obj)
+
+		//DOM对象绑定事件也是属于方法调用
+		document.addEventListener("click",function(e) {
+			console.log(this); //document 相当于方法调用
+			setTimeout(function() {
+				console.log(this); //window 相当于 fn.call(null,f1); -> window
+			},200);
+		},false);
+
+
+		// 2.函数调用模式
+
+		// a.普通函数调用
+		function fn1() {
+			console.log(this);//window
+		}
+		fn1.call(); //相当于fn1.call(window? undefined? null?);
+
+
+		// b.嵌套调用
+		function fn2() {
+			function fn3() {
+				console.log(this); //window
+			}
+			fn3();
+		}
+		fn2();
+
+		// c.把函数赋值之后再调用
+		var obj2 = {
+			a:4,
+			fn5: function() {
+				console.log(a);
+			}
+		}
+		var fn6 = obj2.fn5;
+		fn6() // 1 -> 全局的a  function(){console.log(this.a).call("undefined")}
+
+		//如果你传入的context对象是null或者undefined  那么window对象就是默认的context 严格模式下默认context是undefined
+
+		// d.回掉函数
+		function fn7() {
+			var a = 8;
+		}
+		function fn8(f) {
+			f();
+			console.log(a) // 1 ->全局
+		}
+
+		fn8(fn7);
+
+		// => 改写如下 也是属于最简单的函数调用
+		function fn9() {
+			(function() {var a = 5})();
+			console.log(a);
+		}
+		fn9(); // 1 =>全局a 想到与fn9.call(undefined) 
+
+		setTimeout(function() {
+			console.log(this); //window
+			function fn() {
+				console.log(this) //window
+			}
+			fn();
+		},0); //setTimeout总是丢失this的原因是它本身就是一个回调函数
+
+
+		//构造器调用模式 this指向新创建的每个实例
+		function Person(name,age) {
+			this.name = name;
+			this.age = age;
+			this.sayAge = function() {
+				console.log(this.age); // 3
+			}
+		}
+		var dot = new Person('Dot',3);
+		dot.sayAge();
+
+
+		//call
+		// call方法的第一个参数是要绑定给this的值 第二个参数是参数列表 当第一个参数是null或者undefined的时候 默认指向window
+
+		var arr = [29,35,565,23,8,11];
+		var max = Math.max.call(null,arr[0],arr[1],arr[2],arr[3],arr[4],arr[5]);
+		console.log(max) //565
+
+
+		//理解方式如下
+		// obj1.fn() => obj1.fn.call(obj1);
+
+		// fn1() => fn1.call(null);
+
+		// f1(f2) => f1.call(null,f2)
+
+
+		var obj3 = {
+			message: 'My name is:'
+		}
+
+		function getName(firstname,lastname) {
+			console.log(this.message + firstname + lastname);
+		}
+
+		getName.call(obj3,"黄","丽娟"); //"黄丽娟"
+		//getName.apply(obj3,["黄","丽娟"]); 也可以这样写
+
+
+		//apply
+		//默认接受两个参数 第一个参数是要绑定给this的值 第二个参数是一个参数数组 当第一个参数是null或者undefined的时候 默认指向window
+
+		var arr1 = [3284,4354,12,65,2,656,99];
+		var min = Math.min.apply(null,arr1);
+		console.log(min); // 2
+
+
+		var Person1 = function() {
+			this.name = "Dot";
+		}
+		var Person2 = function() {
+			this.getName = function() {
+				console.log(this.name)
+			}
+			Person1.call(this);
+		}
+		var person = new Person2();
+		person.getName();//"Dot"
+
+
+
+		//bind
+		//和call相似 第一个参数是this的指向 第二个参数是开始接收的参数列表 
+
+		//bind返回值函数 不会立即执行
+		var obj = {
+			name: "Dot"
+		}
+
+		function printName() {
+			console.log(this.name)
+		}
+
+		var dot = printName.bind(obj);
+		console.log(dot) // function printName() {console.log(this.name)}
+		dot(); //Dot
+
+		//参数的使用
+		function fn(a,b,c,d) {
+			console.log(a,b,c,d);
+		}
+
+		var fn1 = fn.bind(null,"Dot");
+
+		fn(1,2,3,4); // 1 2 3 4
+		fn1(1,2,3,4) //Dot 1 2 3 
+		fn1(2,3) //Dot 2 3 undefined
+		fn.call(null,"Dot") //Dot undefined undefined undefined 
+
+		//使用bind实现函数柯里化
+
+		var add = function(x,y) {
+			return function() {
+				return x + y;
+			}
+		}
+
+		var increace = add(1);
+		var addTen = add(10);
+
+		increace(2);
+
+		addTen(2);
+
+
+		// 在低版本的浏览器中没有bind方法 我们可以自己实现一个
+
+		//第一种实现方法 高程原例子
+		// if(!Function.prototype.bind) {
+		// 	Function.prototype.bind = function(context) {
+		// 		var _this = this;
+		// 		var args = Array.prototype.slice.call(context);//将传入的参数转化为一个数组
+		// 		return function() {
+		// 			_this.apply(context,args.slice(1)); //用apply方法实现
+		// 		}
+		// 	}
+		// }
+
+		//第二种实现方法  学习技巧 复杂一点 本文技巧
+		if(!Function.prototype.bind) {
+			Function.prototype.bind = function() {
+				var _this = this,
+					context = [].shift.call(arguments)//shift会删除并返回数组的第一个元素 因此会改变数组的长度
+					args = [].slice.call(arguments);//保存剩下的参数
+				return function() {
+					_this.apply(context,[].contact.call(args,[].slice.call(arguments))); //用apply方法实现
+				}
+			}
+		}
+
+
+		// 应用场景
+		// 1.求数组中的最大值最小值
+		var arr4 = [34,56,78,876,32];
+		var max4 = Math.max.apply(null,arr4);		
+		var min4 = Math.min.apply(null,arr4);	
+		console.log(max4)	
+		console.log(min4)	
+
+
+		// 2.将类数组转化为数组
+		var arrLike = {length:2,a:4,b:7};
+		var trueArr = Array.prototype.slice.call(arrLike);
+
+		// 3.数组追加 
+		var arr5 = [2,443,65];
+		var arr6 = [23,56,29];
+		var total = [].push.apply(arr5,arr6);
+		console.log(arr5) // [2, 443, 65, 23, 56, 29] 
+		console.log(arr6) // [23, 56, 29]
+
+
+		//4.判断变量类型
+		function isArray(obj) {
+			return Object.prototype.toString.call(obj) == "[Object Array]";
+		}
+		console.log(isArray([])) //false?
+
+
+		//5.利用call和apply做继承
+		function People(name,age) {
+			this.name = name;
+			this.age = age;
+			this.sayAge = function() {
+				console.log(this.age)
+			}
+		}
+
+		function Female() {
+			People.apply(this,arguments);//将父元素所有的方法在这里执行一遍就继承了
+		}
+
+		var dot = new Female('Dot',2)
+
+		//6.使用log代理console.log
+
+		function log() {
+			console.log.apply(console,arguments)
+		}
+
+		
+
+	</script>
+</body>
+</html>
