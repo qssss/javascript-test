@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>js判断数据类型的几种方式</title>
+</head>
+<body>
+	<script type="text/javascript">
+		// 1.typeof
+		console.log(typeof(''))//string
+		console.log(typeof(true))//bollean
+		console.log(typeof(1))//number
+		console.log(typeof(null))//object
+		console.log(typeof(undefined))//undefined
+		console.log(typeof(function() {}))//function
+		console.log(typeof([]))//object
+		console.log(typeof({}))//object
+
+		// 2.instanceof只能判断引用类型 不能判断基本数据类型
+		var a = [];
+		console.log(a instanceof Array);//true
+
+		var b = {};
+		console.log(b instanceof Object);//true
+
+		var c = function() {};
+		console.log(c instanceof Function);//true
+
+		// 3.constructor判断 
+		console.log((2).constructor == Number); //true
+		console.log(("").constructor == String); //true
+		console.log((false).constructor == Boolean); //true
+		console.log(([]).constructor == Array);//true
+		console.log(({}).constructor == Object);//true
+		console.log((function(){}).constructor == Function); //true
+		// console.log((null).constructor == Null);// Uncaught TypeError: Cannot read property 'constructor' of null
+		// console.log((undefined).constructor == Undefined); // Uncaught TypeError: Cannot read property 'constructor' of undefined
+
+		// 我们通过更改对象的原型可以轻易的更改constructor的值 所以该方法也不可靠
+		function Foo() {};
+		Foo.prototype = new Array();
+		var bar = new Foo();
+		console.log(bar.constructor == Function) //false
+		console.log(bar.constructor == Array) //true
+
+
+		// 4.Object.prototype.toString.call()  终极判断方法之最优解
+		var obj = Object.prototype.toString;
+		console.log(obj.call('')) //[Object String]
+		console.log(obj.call([])) //[Object Array]
+		console.log(obj.call({})) //[Object Object]
+		console.log(obj.call(false)) //[Object Boolean]
+		console.log(obj.call(undefined)) //[Object Undefined]
+		console.log(obj.call(null)) //[Object Null]
+		console.log(obj.call(1)) //[Object Number]
+		console.log(obj.call(function(){})) //[Object Function]
+	</script>
+</body>
+</html>
